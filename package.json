@@ -2,7 +2,6 @@
   "name": "asset-tracker-website",
   "version": "1.0.0",
   "description": "Assest Tracker Website: A website where users can track and collect valuable information about their financial assets.",
-  "type": "module",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,9 +17,9 @@
   },
   "homepage": "https://github.com/Ameen-Here/Asset-Tracker-Website#readme",
   "dependencies": {
+    "axios": "^0.19.2",
+    "ejs": "^3.1.8",
     "express": "^4.18.1",
-    "https": "^1.0.0",
-    "node-fetch": "^3.2.6",
-    "request": "^2.88.2"
+    "path": "^0.12.7"
   }
 }
