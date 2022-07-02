@@ -68,6 +68,15 @@ app.get("/register", (req, res) => {
   });
 });
 
+app.get("/portfolio", (req, res) => {
+  res.render("portfolio", {
+    pageClass: "portfolioPage",
+    showLogin: false,
+    showReg: false,
+    titleName: "Portfolio",
+  });
+});
+
 // ShowStock and addStock routings.
 
 app.get("/showStock", async (req, res) => {
