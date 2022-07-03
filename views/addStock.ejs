@@ -1,0 +1,30 @@
+<%- layout('/layout/boilerplate.ejs') %>
+
+<form action="/portfolio" class="mb-3 loginForm" method="post">
+  <div class="card card-bg">
+    <div class="card-body">
+      <h5 class="card-title">Confirm The Transaction</h5>
+      <div class="mb-1">
+        <label for="companyName" class="form-label"
+          >Company Name:<%= stockName %>
+        </label>
+      </div>
+      <div class="mb-3">
+        <label for="quantity" class="form-label"
+          >Quantity: <%= quantity %>
+        </label>
+      </div>
+      <div class="mb-3">
+        <label for="price" class="form-label"
+          >Total Cost: <%= stockPrice %>
+        </label>
+      </div>
+      <button name="action" value="cancel" type="submit" class="btn btn-danger">
+        Cancel
+      </button>
+      <button name="action" value="add" type="submit" class="btn btn-success">
+        Add Stock
+      </button>
+    </div>
+  </div>
+</form>

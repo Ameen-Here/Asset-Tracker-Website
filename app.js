@@ -6,7 +6,7 @@ const app = express();
 
 // Custom Helper Functions And Datas
 const { testData, curStock } = require("./Utility Functions/testData");
-const fetchCurPrice = require("./Utility Functions/apiHelperFn");
+const fetchCurReport = require("./Utility Functions/apiHelperFn");
 const stockCalculation = require("./Utility Functions/stockCalc");
 
 app.use(express.urlencoded({ extended: true }));
@@ -21,14 +21,16 @@ app.engine("ejs", ejsMate);
 
 // Test Function (Currently on Testing)
 
-const findPercentage = async function (companyName, add = false) {
-  const companyDetailsFull = await fetchCurPrice(companyName);
+let tempState = {};
+
+const findPercentage = async function (companyName, index, add = false) {
+  const companyDetailsFull = await fetchCurReport(companyName);
   const currentPrice = companyDetailsFull["Global Quote"]["05. price"];
   if (add) {
-    testData[curStock].currentPrice = currentPrice;
-    testData[curStock].totalValue = currentPrice * testData[curStock].noOfStock;
-    testData[curStock].testStockPrice =
-      testData[curStock].investedAmount / testData[curStock].noOfStock; // Testing purpose: Adding stock and finding value
+    testData[index].currentPrice = currentPrice;
+    testData[index].totalValue = currentPrice * testData[curStock].noOfStock;
+    testData[index].testStockPrice =
+      testData[index].investedAmount / testData[index].noOfStock; // Testing purpose: Adding stock and finding value
   }
 
   const result = stockCalculation.findPercentage(currentPrice);
@@ -68,13 +70,27 @@ app.get("/register", (req, res) => {
   });
 });
 
-app.get("/portfolio", (req, res) => {
+app.get("/portfolio", async (req, res) => {
+  if (Object.keys(tempState).length) {
+    const { index, quantity, stockName, stockPrice } = tempState;
+    testData[index].noOfStock += +quantity;
+    testData[index].investedAmount =
+      testData[index].investedAmount + stockPrice * quantity;
+    // const result = await findPercentage(companyName, index, true);
+    console.log(testData[index]);
+  }
+  console.log(req.body);
   res.render("portfolio", {
     pageClass: "portfolioPage",
     showLogin: false,
     showReg: false,
     titleName: "Portfolio",
   });
+});
+
+app.post("/portfolio", (req, res) => {
+  if (req.body.action === "cancel") tempState = {};
+  res.redirect("/portfolio");
 });
 
 // ShowStock and addStock routings.
@@ -93,29 +109,52 @@ app.get("/showStock", async (req, res) => {
   );
 });
 
-app.get("/add", async (req, res) => {
+app.post("/addStock", async (req, res) => {
   // Collect data from user
-  console.log(testData[curStock]);
-  const quantity = 3;
-  const stockPrice = 204;
-  console.log(quantity, stockPrice);
+  const { companyName, quantity } = req.body["company"];
 
+  // Getting current updates of the particular stock
+  const companyDetails = await fetchCurReport(companyName);
+  if (!companyDetails) return res.send("error");
+  const { "05. price": stockPrice, "01. symbol": stockName } =
+    companyDetails["Global Quote"];
   // If stock already exist, add new assets
-  testData[curStock].noOfStock += quantity;
+  const index = testData.findIndex((stock) => {
+    return stock.stockName === stockName;
+  });
 
-  testData[curStock].investedAmount =
-    testData[curStock].investedAmount + stockPrice * quantity;
+  tempState = {
+    quantity,
+    stockPrice,
+    companyName,
+    quantity,
+    index,
+  };
 
-  const companyName = testData[curStock].stockName;
+  if (index === -1) return;
 
-  const result = await findPercentage(companyName, true);
+  console.log(testData[index]);
+  res.render("addStock", {
+    stockName,
+    quantity,
+    stockPrice,
+    pageClass: "portfolioPage",
+    showLogin: false,
+    showReg: false,
+    titleName: "CONFIRM!!!",
+  });
+  // console.log("//////////////////");
 
-  console.log(testData[curStock]);
-
-  res.send(
-    `<h1>Company Name: ${testData[curStock].stockName}</h1><h2>Current Price: ${testData[curStock].currentPrice}</h2>
-    <h2>Total:${testData[curStock].totalValue}     <i style="color:green;">P/L: ${testData[curStock].pAndLossPerc}% </i></h2>`
-  );
+  // testData[index].noOfStock += +quantity;
+  // testData[index].investedAmount =
+  //   testData[index].investedAmount + stockPrice * quantity;
+  // const result = await findPercentage(companyName, index, true);
+  // console.log(testData[index]);
+  // return res.send("ok");
+  // res.send(
+  //   `<h1>Company Name: ${testData[curStock].stockName}</h1><h2>Current Price: ${testData[curStock].currentPrice}</h2>
+  //   <h2>Total:${testData[curStock].totalValue}     <i style="color:green;">P/L: ${testData[curStock].pAndLossPerc}% </i></h2>`
+  // );
 });
 
 app.get("/delete", async (req, res) => {
@@ -123,7 +162,7 @@ app.get("/delete", async (req, res) => {
   const quantity = 3;
 
   const companyName = testData[curStock].stockName;
-  const companyDetailsFull = await fetchCurPrice(companyName);
+  const companyDetailsFull = await fetchCurReport(companyName);
   console.log(companyDetailsFull);
   const currentPrice = companyDetailsFull["Global Quote"]["05. price"];
 

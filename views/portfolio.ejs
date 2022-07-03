@@ -49,7 +49,7 @@
   </div>
   <div class="tools">
     <div class="add-stock">
-      <form action="/" class="mb-3 add-stock-form">
+      <form action="/addStock" class="mb-3 add-stock-form" method="post">
         <div class="card card-bg">
           <div class="card-body">
             <h5 class="card-title">Add stock</h5>
@@ -59,6 +59,7 @@
                 type="text"
                 class="form-control"
                 id="companyName"
+                name="company[companyName]"
                 placeholder="Company Name"
               />
             </div>
@@ -69,6 +70,7 @@
                 class="form-control"
                 id="quantity"
                 placeholder="Quantity"
+                name="company[quantity]"
               />
             </div>
             <button type="submit" class="btn btn-success">Add Stock</button>

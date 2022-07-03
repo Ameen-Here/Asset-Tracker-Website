@@ -10,7 +10,7 @@ const testData = [
     investedAmount: 1081.3,
   },
   {
-    stockName: "Sun TV",
+    stockName: "SUNTV.BSE",
     testStockPrice: 205.31,
     noOfStock: 7,
     currentPrice: 205.31,
