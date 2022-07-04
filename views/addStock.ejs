@@ -6,7 +6,7 @@
       <h5 class="card-title">Confirm The Transaction</h5>
       <div class="mb-1">
         <label for="companyName" class="form-label"
-          >Company Name:<%= stockName %>
+          >Company Name: <%= stockName %>
         </label>
       </div>
       <div class="mb-3">
@@ -15,15 +15,20 @@
         </label>
       </div>
       <div class="mb-3">
-        <label for="price" class="form-label"
-          >Total Cost: <%= stockPrice %>
+        <label for="stock-price" class="form-label"
+          >Stock Price: <%= (stockPrice * 1).toFixed(2) %>
         </label>
       </div>
-      <button name="action" value="cancel" type="submit" class="btn btn-danger">
-        Cancel
-      </button>
+      <div class="mb-3">
+        <label for="price" class="form-label"
+          >Total Cost: <%= (stockPrice * quantity).toFixed(2) %>
+        </label>
+      </div>
       <button name="action" value="add" type="submit" class="btn btn-success">
         Add Stock
+      </button>
+      <button name="action" value="cancel" type="submit" class="btn btn-danger">
+        Cancel
       </button>
     </div>
   </div>

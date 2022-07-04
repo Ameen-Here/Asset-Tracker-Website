@@ -8,15 +8,17 @@ const testData = [
     totalValue: 1081.3,
     pAndLossPerc: 0,
     investedAmount: 1081.3,
+    symbol: "NUCLEUS.BSE'",
   },
   {
-    stockName: "SUNTV.BSE",
+    stockName: "SUNTV",
     testStockPrice: 205.31,
     noOfStock: 7,
     currentPrice: 205.31,
     totalValue: 1437.17,
     pAndLossPerc: 0,
     investedAmount: 1437.17,
+    symbol: "SUNTV.BSE",
   },
 ];
 

@@ -1,6 +1,6 @@
-const { testData, curStock } = require("./testData");
+const { testData } = require("./testData");
 
-const findPercentage = function (currentPrice) {
+const findPercentage = function (currentPrice, curStock) {
   let result; // Getting current price from the details
   if (currentPrice - testData[curStock].testStockPrice < 0) {
     result =

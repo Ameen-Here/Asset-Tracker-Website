@@ -1,52 +1,34 @@
 <%- layout('/layout/boilerplate.ejs') %>
 
 <div class="portfolio-main">
-  <div class="asset-summary">
-    <div class="asset">
-      <div class="asset-left">
-        <p>Sun Tv Network</p>
-        <p class="text-muted">5 x Rs.463.10</p>
-        <p>Current Price: 450</p>
+  <div class="left-side">
+    <h4 style="margin-left: 80px">Portfolio Summary</h4>
+    <div class="asset-summary">
+      <h4 class="mb-4">Current Holdings</h4>
+
+      <% for(let company of testData) {%>
+      <div class="asset">
+        <div class="asset-left">
+          <p><%= company.stockName %></p>
+          <p class="text-muted">
+            <%= company.noOfStock %> x Rs.<%= company.testStockPrice %>
+          </p>
+          <p>Current Price: <%= (company.currentPrice * 1).toFixed(2) %></p>
+        </div>
+        <div class="asset-right">
+          <p>Rs <%= (company.totalValue * 1).toFixed(2) %></p>
+          <p
+            style="color: <%= company.investedAmount - company.totalValue>0? 'green':'red' %> "
+          >
+            Rs<%= ((company.investedAmount - company.totalValue) * 1).toFixed(2)
+            %> (<%= company.pAndLossPerc %> %)
+          </p>
+        </div>
       </div>
-      <div class="asset-right">
-        <p>Rs 4567</p>
-        <p style="color: green">+Rs320 (8.06%)</p>
-      </div>
-    </div>
-    <div class="asset">
-      <div class="asset-left">
-        <p>Sun Tv Network</p>
-        <p class="text-muted">5 x Rs.463.10</p>
-        <p>Current Price: 450</p>
-      </div>
-      <div class="asset-right">
-        <p>Rs 4567</p>
-        <p style="color: green">+Rs320 (8.06%)</p>
-      </div>
-    </div>
-    <div class="asset">
-      <div class="asset-left">
-        <p>Sun Tv Network</p>
-        <p class="text-muted">5 x Rs.463.10</p>
-        <p>Current Price: 450</p>
-      </div>
-      <div class="asset-right">
-        <p>Rs 4567</p>
-        <p style="color: green">+Rs320 (8.06%)</p>
-      </div>
-    </div>
-    <div class="asset">
-      <div class="asset-left">
-        <p>Sun Tv Network</p>
-        <p class="text-muted">5 x Rs.463.10</p>
-        <p>Current Price: 450</p>
-      </div>
-      <div class="asset-right">
-        <p>Rs 4567</p>
-        <p style="color: green">+Rs320 (8.06%)</p>
-      </div>
+      <% } %>
     </div>
   </div>
+
   <div class="tools">
     <div class="add-stock">
       <form action="/addStock" class="mb-3 add-stock-form" method="post">
