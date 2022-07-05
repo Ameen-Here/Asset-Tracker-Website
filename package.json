@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Ameen-Here/Asset-Tracker-Website#readme",
   "dependencies": {
     "axios": "^0.19.2",
+    "chart.js": "^3.8.0",
     "ejs": "^3.1.8",
     "ejs-mate": "^4.0.0",
     "express": "^4.18.1",

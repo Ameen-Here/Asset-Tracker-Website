@@ -25,10 +25,11 @@ let tempState = {}; // For holding temporary value when adding a stock before co
 
 async function getCurrentPrice(companyName) {
   const companyDetailsFull = await fetchCurReport(companyName);
-  if (!companyDetails) return res.send("error");
+  if (!companyDetailsFull) return res.send("error");
+  console.log(companyDetailsFull);
   return {
     currentPrice: companyDetailsFull["Global Quote"]["05. price"],
-    symbol: companyDetailsFull["Global QUote"]["01. symbol"],
+    symbol: companyDetailsFull["Global Quote"]["01. symbol"],
   };
 }
 
@@ -36,7 +37,7 @@ const updatePrice = async function (companyName, index) {
   const { currentPrice } = await getCurrentPrice(companyName);
 
   testData[index].currentPrice = currentPrice;
-  testData[index].investedAmount = currentPrice * testData[index].noOfStock;
+  testData[index].totalValue = currentPrice * testData[index].noOfStock;
   // Testing purpose: Adding stock and finding value
 
   const result = stockCalculation.findPercentage(currentPrice, index);
@@ -84,6 +85,8 @@ app.get("/portfolio", async (req, res) => {
     showReg: false,
     titleName: "Portfolio",
     testData,
+    stockLabel: testData.map((data) => data.stockName),
+    stockValue: testData.map((data) => data.totalValue),
   });
 });
 
@@ -147,6 +150,16 @@ app.post("/addStock", async (req, res) => {
     showLogin: false,
     showReg: false,
     titleName: "CONFIRM!!!",
+  });
+});
+
+// Just to test out chart.js
+// label country names
+
+app.get("/chart", (req, res) => {
+  res.render("chart", {
+    stockLabel: testData.map((data) => data.stockName),
+    stockValue: testData.map((data) => data.totalValue),
   });
 });
 

@@ -16,12 +16,12 @@
           <p>Current Price: <%= (company.currentPrice * 1).toFixed(2) %></p>
         </div>
         <div class="asset-right">
-          <p>Rs <%= (company.totalValue * 1).toFixed(2) %></p>
+          <p>Total value: Rs <%= (company.totalValue * 1).toFixed(2) %></p>
           <p
-            style="color: <%= company.investedAmount - company.totalValue>0? 'green':'red' %> "
+            style="color: <%= company.totalValue - company.investedAmount > 0? 'green':'red' %> "
           >
-            Rs<%= ((company.investedAmount - company.totalValue) * 1).toFixed(2)
-            %> (<%= company.pAndLossPerc %> %)
+            P/L: Rs<%= ((company.investedAmount - company.totalValue) *
+            1).toFixed(2) %> (<%= company.pAndLossPerc %> %)
           </p>
         </div>
       </div>
@@ -61,7 +61,49 @@
       </form>
     </div>
     <div class="pie-chart">
-      <div class="piechart"></div>
+      <h4>Asset Visualization</h4>
+      <canvas id="myChart"></canvas>
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const labelArray = "<%-stockLabel%>".split(",");
+  const valueArray = "<%-stockValue%>".split(",");
+
+  const labels = labelArray;
+
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: "My First dataset",
+        backgroundColor: [
+          "rgba(0, 0, 255, 0.6)",
+          "rgba(255, 0, 0, 0.6)",
+          "rgba(0, 128, 0, 0.6)",
+          "rgba(0, 0, 0, 0.6)",
+          "rgb(255, 99, 132,0.6)",
+          "rgba(245, 40, 145, 0.6)",
+          "rgba(37, 36, 190, 0.6)",
+          "rgba(0, 206, 255, 0.6)",
+          "rgba(0, 255, 96, 0.6)",
+          "rgba(22, 47, 15, 0.6)",
+
+          ,
+        ],
+        borderColor: "rgb(255,255,255)",
+        data: valueArray,
+      },
+    ],
+  };
+
+  const config = {
+    type: "pie",
+    data: data,
+    options: {},
+  };
+
+  const myChart = new Chart(document.getElementById("myChart"), config);
+</script>
