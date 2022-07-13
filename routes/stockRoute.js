@@ -21,17 +21,24 @@ const updatePrice = async function (companyName, index) {
 async function getCurrentPrice(companyName) {
   const companyDetailsFull = await fetchCurReport(companyName);
   if (!companyDetailsFull) return res.send("error");
-  console.log(companyDetailsFull);
   return {
     currentPrice: companyDetailsFull["Global Quote"]["05. price"],
     symbol: companyDetailsFull["Global Quote"]["01. symbol"],
   };
 }
 
+router.route("/trial").get((req, res) => {
+  res.render("trailAddStock", {
+    pageClass: "portfolioPage",
+    showLogin: false,
+    showReg: false,
+    titleName: "Portfolio",
+  });
+});
+
 router
   .route("/portfolio")
   .get(async (req, res) => {
-    console.log(testData);
     for (let i = 0; i < testData.length; i++) {
       await updatePrice(testData[i].stockName, i);
     }

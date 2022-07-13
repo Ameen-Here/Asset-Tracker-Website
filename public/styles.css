@@ -159,7 +159,23 @@
 }
 
 .add-stock-form {
-  width: 300px;
+  width: 330px;
+}
+
+#cAsset {
+  margin-left: 10px;
+}
+
+.stock-price-form {
+  font-size: 14px;
+}
+
+#price-form {
+  display: none;
+}
+
+#custom-asset {
+  display: none;
 }
 
 .piechart {
