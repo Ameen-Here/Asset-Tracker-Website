@@ -34,26 +34,118 @@
       <form action="/addStock" class="mb-3 add-stock-form" method="post">
         <div class="card card-bg">
           <div class="card-body">
-            <h5 class="card-title">Add stock</h5>
-            <div class="mb-1">
-              <label for="companyName" class="form-label">Company Name:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="companyName"
-                name="company[companyName]"
-                placeholder="Company Name"
+            <h5 class="card-title mb-2">Add stock</h5>
+            <label class="mb-3" for="nAsset"
+              ><input
+                type="radio"
+                id="nAsset"
+                name="format"
+                value="NormalAsset"
+                class="asset-check"
+                checked
               />
+              Normal Asset</label
+            ><label for="cAsset"
+              ><input
+                type="radio"
+                name="format"
+                id="cAsset"
+                value="customAsset"
+                class="asset-check"
+              />
+              Custom Asset</label
+            >
+            <div id="normal-asset">
+              <div class="mb-1">
+                <label for="companyName" class="form-label"
+                  >Company Name:</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="companyName"
+                  name="company[companyName]"
+                  placeholder="Company Name"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity</label>
+                <input
+                  type="Number"
+                  class="form-control"
+                  id="quantity"
+                  placeholder="Quantity"
+                  name="company[quantity]"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="stock-price-form" for="curStockPrice">
+                  <input
+                    type="radio"
+                    id="curStockPrice"
+                    name="company[isStockPrice]"
+                    class="stock-price-radio"
+                    value="false"
+                    checked
+                  />
+                  Current Price</label
+                >
+                <label class="stock-price-form" for="cusStockPrice">
+                  <input
+                    type="radio"
+                    id="cusStockPrice"
+                    class="stock-price-radio"
+                    name="company[isStockPrice]"
+                    value="true"
+                  />
+                  Custom Price</label
+                >
+              </div>
+              <div class="mb-3" id="price-form">
+                <label for="price" class="form-label">Stock Price</label>
+                <input
+                  type="Number"
+                  min="0"
+                  class="form-control"
+                  id="price"
+                  placeholder="Stock Price"
+                  name="company[stockPrice]"
+                />
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="quantity" class="form-label">Quantity</label>
-              <input
-                type="Number"
-                class="form-control"
-                id="quantity"
-                placeholder="Quantity"
-                name="company[quantity]"
-              />
+            <div id="custom-asset">
+              <div class="mb-1">
+                <label for="assetName" class="form-label">Asset Name:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="assetName"
+                  name="asset[companyName]"
+                  placeholder="Asset Name"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="assetQuantity" class="form-label">Quantity</label>
+                <input
+                  type="Number"
+                  class="form-control"
+                  id="assetQuantity"
+                  placeholder="Quantity"
+                  name="asset[quantity]"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="assetPrice" class="form-label">Asset Price</label>
+                <input
+                  type="Number"
+                  min="0"
+                  class="form-control"
+                  id="assetPrice"
+                  placeholder="Price"
+                  name="asset[stockPrice]"
+                />
+              </div>
             </div>
             <button type="submit" class="btn btn-success">Add Stock</button>
           </div>
@@ -106,4 +198,35 @@
   };
 
   const myChart = new Chart(document.getElementById("myChart"), config);
+</script>
+
+<script>
+  const stockPriceChecker = document.querySelectorAll(".stock-price-radio");
+  const priceForm = document.querySelector("#price-form");
+
+  const assetChecker = document.querySelectorAll(".asset-check");
+  const normalAssetForm = document.getElementById("normal-asset");
+  const customAssetForm = document.getElementById("custom-asset");
+
+  stockPriceChecker.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      if (e.target.id === "cusStockPrice") {
+        priceForm.style.display = "block";
+      } else {
+        priceForm.style.display = "none";
+      }
+    });
+
+    assetChecker.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        if (e.target.id === "cAsset") {
+          normalAssetForm.style.display = "none";
+          customAssetForm.style.display = "block";
+        } else {
+          normalAssetForm.style.display = "block";
+          customAssetForm.style.display = "none";
+        }
+      });
+    });
+  });
 </script>

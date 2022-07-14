@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const { testData } = require("../Utility Functions/testData");
-const fetchCurReport = require("../Utility Functions/apiHelperFn");
+const {
+  fetchCurReport,
+  fetchSymbol,
+} = require("../Utility Functions/apiHelperFn");
 const stockCalculation = require("../Utility Functions/stockCalc");
 
 let tempState = {}; // For holding temporary value when adding a stock before confirmation
@@ -17,6 +20,11 @@ const updatePrice = async function (companyName, index) {
   const result = stockCalculation.findPercentage(currentPrice, index);
   testData[index].pAndLossPerc = result;
 };
+
+async function getSymbol(companyName) {
+  const companyDetailsFull = await fetchCurReport(companyName);
+  if (!companyDetailsFull) return res.send("error");
+}
 
 async function getCurrentPrice(companyName) {
   const companyDetailsFull = await fetchCurReport(companyName);
@@ -71,21 +79,14 @@ router
     res.redirect("/portfolio");
   });
 
-router.post("/addStock", async (req, res) => {
-  // Collect data from user
-  const { companyName, quantity: noOfStock } = req.body["company"];
-
-  // Getting current updates of the particular stock
-
-  const { currentPrice: stockPrice, symbol } = await getCurrentPrice(
-    companyName
-  );
-  // If stock already exist, add new assets
-  const index = testData.findIndex((stock) => {
-    return stock.symbol === symbol;
-  });
-
-  tempState = {
+const buildTempState = function (
+  noOfStock,
+  stockPrice,
+  companyName,
+  symbol,
+  index = -1
+) {
+  return {
     noOfStock,
     currentPrice: stockPrice,
     testStockPrice: stockPrice,
@@ -96,11 +97,55 @@ router.post("/addStock", async (req, res) => {
     index: index === -1 ? testData.length : index,
     symbol,
   };
+};
+
+const normalAssetBuilder = async function (company) {
+  // The normal functions
+  let symbol, stockPrice;
+  const { companyName, quantity: noOfStock, isStockPrice } = company;
+  const stockPriceGiven = isStockPrice == "true";
+  if (!stockPriceGiven) {
+    // Getting current updates of the particular stock
+    ({ currentPrice: stockPrice, symbol } = await getCurrentPrice(companyName));
+  } else {
+    ({ stockPrice } = company);
+    symbol = await fetchSymbol(companyName);
+  }
+  // If stock already exist, add new assets
+  const index = testData.findIndex((stock) => {
+    return stock.symbol === symbol;
+  });
+  return buildTempState(noOfStock, stockPrice, companyName, symbol, index);
+};
+
+const customAssetBuilder = async function (asset) {
+  // assetFunctions
+  const { companyName, quantity: noOfStock, stockPrice } = asset;
+  stockPriceGiven = true;
+  symbol = companyName;
+  return buildTempState(noOfStock, stockPrice, companyName, symbol);
+};
+
+router.post("/trailStock", async (req, res) => {
+  const { format, company, asset } = req.body;
+  let tempState;
+  if (format === "NormalAsset") {
+    tempState = await normalAssetBuilder(company);
+    return res.send(tempState);
+  }
+  tempState = await customAssetBuilder(asset);
+  res.send(tempState);
+});
+
+router.post("/addStock", async (req, res) => {
+  const { format, company, asset } = req.body;
+  if (format === "NormalAsset") tempState = await normalAssetBuilder(company);
+  else tempState = await customAssetBuilder(asset);
 
   res.render("addStock", {
-    stockName: symbol,
-    quantity: noOfStock,
-    stockPrice,
+    stockName: tempState.symbol,
+    quantity: tempState.noOfStock,
+    stockPrice: tempState.currentPrice,
     pageClass: "portfolioPage",
     showLogin: false,
     showReg: false,

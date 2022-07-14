@@ -2,7 +2,7 @@
 
 <div class="tools">
   <div class="add-stock">
-    <form action="/addStock" class="mb-3 add-stock-form" method="post">
+    <form action="/trailStock" class="mb-3 add-stock-form" method="post">
       <div class="card card-bg">
         <div class="card-body">
           <h5 class="card-title mb-2">Add stock</h5>
@@ -90,7 +90,7 @@
                 class="form-control"
                 id="assetName"
                 name="asset[companyName]"
-                placeholder="Company Name"
+                placeholder="Asset Name"
               />
             </div>
             <div class="mb-3">
@@ -120,6 +120,10 @@
         </div>
       </div>
     </form>
+  </div>
+  <div class="pie-chart">
+    <h4>Asset Visualization</h4>
+    <canvas id="myChart"></canvas>
   </div>
 </div>
 
