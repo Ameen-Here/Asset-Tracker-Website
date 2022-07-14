@@ -126,17 +126,6 @@ const customAssetBuilder = async function (asset) {
   return buildTempState(noOfStock, stockPrice, companyName, symbol);
 };
 
-router.post("/trailStock", async (req, res) => {
-  const { format, company, asset } = req.body;
-  let tempState;
-  if (format === "NormalAsset") {
-    tempState = await normalAssetBuilder(company);
-    return res.send(tempState);
-  }
-  tempState = await customAssetBuilder(asset);
-  res.send(tempState);
-});
-
 router.post("/addStock", async (req, res) => {
   const { format, company, asset } = req.body;
   if (format === "NormalAsset") tempState = await normalAssetBuilder(company);
