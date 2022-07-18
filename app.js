@@ -3,6 +3,22 @@ const path = require("path");
 const ejsMate = require("ejs-mate");
 const app = express();
 
+const mongoose = require("mongoose");
+
+const User = require("./models/User");
+
+// Connect to mongoose
+mongoose.connect("mongodb://localhost:27017/asset-tracker", {
+  useNewUrlParser: true,
+  //   useCreateIndex: true,
+  useUnifiedTopology: true,
+  //   useFindAndModify: false,
+});
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "Connection error:"));
+db.once("open", () => console.log("Database Connected"));
+
 // Express Routes
 const generalRoute = require("./routes/login_register_home");
 const stockRoute = require("./routes/stockRoute");
@@ -22,6 +38,15 @@ app.use(express.static(path.join(__dirname, "public")));
 // General Routing: Homepage, Login, Register
 app.use("/", generalRoute);
 
+app.get("/fakeLogin", async (req, res) => {
+  const user = new User({
+    name: "Ameen",
+    email: "ameenair6@gmail.com",
+  });
+  await user.save();
+  res.send(user);
+});
+
 app.use("/", stockRoute);
 
-app.listen(3000, console.log("Listening to port 3000"));
+app.listen(3000, () => console.log("Listening to port 3000"));
