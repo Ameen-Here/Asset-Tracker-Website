@@ -8,7 +8,7 @@ const testData = [
     totalValue: 1081.3,
     pAndLossPerc: 0,
     investedAmount: 1081.3,
-    symbol: "NUCLEUS.BSE'",
+    symbol: "NUCLEUS.BSE",
     isCustomAsset: false,
     updateTime: 1658142229505,
   },

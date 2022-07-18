@@ -1,7 +1,20 @@
 const express = require("express");
 const router = express.Router();
 
-const { testData, MILLISECOND } = require("../Utility Functions/testData");
+const User = require("../models/User");
+const Asset = require("../models/User");
+
+const { MILLISECOND } = require("../Utility Functions/testData");
+
+// TESTING DATAS
+let testData = {};
+(async () => {
+  testData = await User.findOne({ name: "Ameen Noushad" }).populate("assets");
+  testData = testData.assets;
+  console.log(testData);
+})();
+
+/////////////////////////////////
 const {
   fetchCurReport,
   fetchSymbol,
@@ -20,7 +33,7 @@ const updatePrice = async function (companyName, index, curTime) {
   testData[index].updateTime = curTime;
   // Testing purpose: Adding stock and finding value
 
-  const result = stockCalculation.findPercentage(currentPrice, index);
+  const result = stockCalculation.findPercentage(testData, currentPrice, index);
   testData[index].pAndLossPerc = result;
 };
 
@@ -51,12 +64,14 @@ router
   .route("/portfolio")
   .get(async (req, res) => {
     const curTime = dt.getTime();
+
     for (let i = 0; i < testData.length; i++) {
       const timeDiff = curTime - testData[i].updateTime;
       if (testData[i].isCustomAsset || timeDiff < MILLISECOND) continue;
 
       await updatePrice(testData[i].stockName, i, curTime);
     }
+    console.log(testData);
     res.render("portfolio", {
       pageClass: "portfolioPage",
       showLogin: false,
@@ -67,7 +82,7 @@ router
       stockValue: testData.map((data) => data.totalValue),
     });
   })
-  .post((req, res) => {
+  .post(async (req, res) => {
     if (req.body.action !== "cancel") {
       if (tempState.index === testData.length) {
         testData.push({
@@ -81,10 +96,19 @@ router
         testData[index].totalValue =
           testData[index].totalValue + currentPrice * noOfStock;
       }
+
+      const index = tempState.index;
+      const curTime = dt.getTime();
+
+      await updatePrice(testData[index].stockName, index, curTime);
     }
 
     res.redirect("/portfolio");
   });
+
+router.get("/fakeLogin", async (req, res) => {
+  res.render("fakeChart", { testData });
+});
 
 const buildTempState = function (
   noOfStock,
@@ -125,9 +149,14 @@ const normalAssetBuilder = async function (company) {
   }
   // If stock already exist, add new assets
 
+  symbol = symbol.split(".")[0];
+
   const index = testData.findIndex((stock) => {
+    console.log(stock.symbol);
+    console.log(symbol);
     return stock.symbol === symbol;
   });
+  console.log(index);
   return buildTempState(
     noOfStock,
     stockPrice,
@@ -148,8 +177,11 @@ const customAssetBuilder = async function (asset) {
 
 router.post("/addStock", async (req, res) => {
   const { format, company, asset } = req.body;
-  if (format === "NormalAsset") tempState = await normalAssetBuilder(company);
-  else tempState = await customAssetBuilder(asset);
+  console.log(req.body);
+  console.log(company);
+  if (format === "NormalAsset") {
+    tempState = await normalAssetBuilder(company);
+  } else tempState = await customAssetBuilder(asset);
 
   res.render("addStock", {
     stockName: tempState.symbol,

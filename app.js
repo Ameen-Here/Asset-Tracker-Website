@@ -6,6 +6,7 @@ const app = express();
 const mongoose = require("mongoose");
 
 const User = require("./models/User");
+const Asset = require("./models/Asset");
 
 // Connect to mongoose
 mongoose.connect("mongodb://localhost:27017/asset-tracker", {
@@ -37,15 +38,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // General Routing: Homepage, Login, Register
 app.use("/", generalRoute);
-
-app.get("/fakeLogin", async (req, res) => {
-  const user = new User({
-    name: "Ameen",
-    email: "ameenair6@gmail.com",
-  });
-  await user.save();
-  res.send(user);
-});
 
 app.use("/", stockRoute);
 

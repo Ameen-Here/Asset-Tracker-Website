@@ -20,7 +20,7 @@
           <p
             style="color: <%= company.totalValue - company.investedAmount >= 0? 'green':'red' %> "
           >
-            P/L: Rs<%= ((company.investedAmount - company.totalValue) *
+            P/L: Rs<%= ((company.totalValue - company.investedAmount) *
             1).toFixed(2) %> (<%= company.pAndLossPerc %> %)
           </p>
         </div>
@@ -158,6 +158,9 @@
     </div>
   </div>
 </div>
+<div id="barChart">
+  <canvas id="myBarChart"></canvas>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -229,4 +232,49 @@
       });
     });
   });
+</script>
+
+<script>
+  const labelBar = "<%-testData.map((data) => data.stockName)%>".split(",");
+  const totalValueArray = "<%-testData.map((data) => data.totalValue)%>".split(
+    ","
+  );
+  const totalInvestment =
+    "<%-testData.map((data) => data.investedAmount)%>".split(",");
+
+  console.log(typeof totalValueArray);
+  console.log(labelBar);
+
+  // setup
+  const dataBar = {
+    labels: labelBar,
+    datasets: [
+      {
+        label: "Invested Amount",
+        data: totalInvestment,
+        backgroundColor: ["#ABD6DFFF"],
+        borderColor: ["black"],
+        borderWidth: 1,
+      },
+      {
+        label: "Total Value",
+        data: totalValueArray,
+        backgroundColor: ["#7DB46CFF"],
+        borderColor: ["black"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  // config
+  const configBar = {
+    type: "bar",
+    data: dataBar,
+  };
+
+  // render init block
+  const myBarChart = new Chart(
+    document.getElementById("myBarChart"),
+    configBar
+  );
 </script>
