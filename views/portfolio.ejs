@@ -18,7 +18,7 @@
         <div class="asset-right">
           <p>Total value: Rs <%= (company.totalValue * 1).toFixed(2) %></p>
           <p
-            style="color: <%= company.totalValue - company.investedAmount > 0? 'green':'red' %> "
+            style="color: <%= company.totalValue - company.investedAmount >= 0? 'green':'red' %> "
           >
             P/L: Rs<%= ((company.investedAmount - company.totalValue) *
             1).toFixed(2) %> (<%= company.pAndLossPerc %> %)

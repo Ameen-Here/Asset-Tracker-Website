@@ -9,6 +9,8 @@ const testData = [
     pAndLossPerc: 0,
     investedAmount: 1081.3,
     symbol: "NUCLEUS.BSE'",
+    isCustomAsset: false,
+    updateTime: 1658142229505,
   },
   {
     stockName: "SUNTV",
@@ -19,9 +21,13 @@ const testData = [
     pAndLossPerc: 0,
     investedAmount: 1437.17,
     symbol: "SUNTV.BSE",
+    isCustomAsset: false,
+    updateTime: 1658142229505,
   },
 ];
 
+const MILLISECOND = 86400000;
+
 const curStock = 0; // For selecting stock from test data
 
-module.exports = { testData, curStock };
+module.exports = { testData, curStock, MILLISECOND };

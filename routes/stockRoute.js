@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { testData } = require("../Utility Functions/testData");
+const { testData, MILLISECOND } = require("../Utility Functions/testData");
 const {
   fetchCurReport,
   fetchSymbol,
@@ -10,11 +10,14 @@ const stockCalculation = require("../Utility Functions/stockCalc");
 
 let tempState = {}; // For holding temporary value when adding a stock before confirmation
 
-const updatePrice = async function (companyName, index) {
+const dt = new Date(); // for checking last update
+
+const updatePrice = async function (companyName, index, curTime) {
   const { currentPrice } = await getCurrentPrice(companyName);
 
   testData[index].currentPrice = currentPrice;
   testData[index].totalValue = currentPrice * testData[index].noOfStock;
+  testData[index].updateTime = curTime;
   // Testing purpose: Adding stock and finding value
 
   const result = stockCalculation.findPercentage(currentPrice, index);
@@ -47,8 +50,12 @@ router.route("/trial").get((req, res) => {
 router
   .route("/portfolio")
   .get(async (req, res) => {
+    const curTime = dt.getTime();
     for (let i = 0; i < testData.length; i++) {
-      await updatePrice(testData[i].stockName, i);
+      const timeDiff = curTime - testData[i].updateTime;
+      if (testData[i].isCustomAsset || timeDiff < MILLISECOND) continue;
+
+      await updatePrice(testData[i].stockName, i, curTime);
     }
     res.render("portfolio", {
       pageClass: "portfolioPage",
@@ -84,8 +91,11 @@ const buildTempState = function (
   stockPrice,
   companyName,
   symbol,
+  isCustomAsset,
   index = -1
 ) {
+  let updateTime = index === -1 ? 100 : dt.getTime();
+
   return {
     noOfStock,
     currentPrice: stockPrice,
@@ -96,6 +106,8 @@ const buildTempState = function (
     pAndLossPerc: 0,
     index: index === -1 ? testData.length : index,
     symbol,
+    isCustomAsset,
+    updateTime,
   };
 };
 
@@ -112,10 +124,18 @@ const normalAssetBuilder = async function (company) {
     symbol = await fetchSymbol(companyName);
   }
   // If stock already exist, add new assets
+
   const index = testData.findIndex((stock) => {
     return stock.symbol === symbol;
   });
-  return buildTempState(noOfStock, stockPrice, companyName, symbol, index);
+  return buildTempState(
+    noOfStock,
+    stockPrice,
+    companyName,
+    symbol,
+    false,
+    index
+  );
 };
 
 const customAssetBuilder = async function (asset) {
@@ -123,7 +143,7 @@ const customAssetBuilder = async function (asset) {
   const { companyName, quantity: noOfStock, stockPrice } = asset;
   stockPriceGiven = true;
   symbol = companyName;
-  return buildTempState(noOfStock, stockPrice, companyName, symbol);
+  return buildTempState(noOfStock, stockPrice, companyName, symbol, true);
 };
 
 router.post("/addStock", async (req, res) => {
