@@ -2,6 +2,16 @@
   margin: 0;
 }
 
+.main-header {
+  margin-left: 80px;
+
+  font-size: 30px;
+}
+.header-two {
+  margin-bottom: 40px;
+  margin-top: 30px;
+}
+
 /* For Background image */
 .homepage {
   background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
@@ -116,13 +126,17 @@
   box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
 }
 
+.left-side {
+  min-height: 500px;
+  margin-top: 100px;
+}
+
+.asset-header {
+  margin-top: 0;
+}
+
 /* .asset-summary button {
 } */
-
-.tools {
-  margin-top: 90px;
-  margin-right: 80px;
-}
 
 .asset {
   display: flex;
@@ -148,6 +162,8 @@
 }
 
 .tools {
+  margin-top: 90px;
+  margin-right: 80px;
   /* background-color: aqua; */
   display: flex;
   flex-direction: column;
@@ -191,7 +207,55 @@
 /* FORM  */
 
 /* Chart */
+#chart-field {
+  margin-top: 20px;
+  display: flex;
+  gap: 30px;
+  margin-left: 50px;
+}
+
 #barChart {
   height: 400px;
   width: 500px;
+}
+
+#myChart {
+  height: 250px;
+  width: 250px;
+}
+
+.assets-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.asset-top-list {
+  margin-top: 60px;
+  height: 300px;
+  padding: 50px 20px;
+  width: 350px;
+  margin-right: 100px;
+  background-color: white;
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+}
+
+.asset-top-list ol {
+  padding-left: 15px;
+}
+.asset-top-list li:nth-child(1) {
+  margin-top: 30px;
+}
+
+.asset-top-list li {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.performer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.center {
+  text-align: center;
 }

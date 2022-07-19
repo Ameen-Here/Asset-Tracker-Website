@@ -2,9 +2,9 @@
 
 <div class="portfolio-main">
   <div class="left-side">
-    <h4 style="margin-left: 80px">Portfolio Summary</h4>
+    <h1 class="main-header">Portfolio Summary</h4>
     <div class="asset-summary">
-      <h4 class="mb-4">Current Holdings</h4>
+      <h4 class="mb-4 asset-header">Current Holdings</h4>
 
       <% for(let company of testData) {%>
       <div class="asset">
@@ -152,15 +152,36 @@
         </div>
       </form>
     </div>
-    <div class="pie-chart">
-      <h4>Asset Visualization</h4>
-      <canvas id="myChart"></canvas>
-    </div>
   </div>
 </div>
-<div id="barChart">
-  <canvas id="myBarChart"></canvas>
+<div class="assets-info">
+  <div class="chart-info">
+    <h1 class="main-header header-two center">Asset Visualization</h4>
+      <div id="chart-field">
+        <div class="pie-chart">
+          <canvas id="myChart"></canvas>
+        </div>
+        <div id="barChart">
+          <canvas id="myBarChart"></canvas>
+        </div>
+      </div>
+  </div>
+  <div class="asset-top-list">
+    <h3 class="center" >Top Performers</h3>
+    <ol>
+      <% for(let company of topGainers) { %>   
+      <li class="performer"> 
+        <%= company.i + 1 %> <%= company.name %> 
+        <div class="value-asset " style="color: <%= company.value >= 0? 'green':'red' %> "> <%= company.value %>%</div>
+      </li>
+      <% } %> 
+     
+    </ol>
+  </div>
+  
 </div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>

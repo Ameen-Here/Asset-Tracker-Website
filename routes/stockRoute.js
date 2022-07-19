@@ -2,17 +2,28 @@ const express = require("express");
 const router = express.Router();
 
 const User = require("../models/User");
-const Asset = require("../models/User");
+const Asset = require("../models/Asset");
 
 const { MILLISECOND } = require("../Utility Functions/testData");
 
 // TESTING DATAS
-let testData = {};
-(async () => {
-  testData = await User.findOne({ name: "Ameen Noushad" }).populate("assets");
-  testData = testData.assets;
+
+const getTestDatas = async () => {
+  const testData = await User.findOne({ name: "Ameen Noushad" }).populate(
+    "assets"
+  );
+  return testData.assets;
+};
+
+const setTestData = async (data) => {
+  const testData = await User.findOne({ name: "Ameen Noushad" });
   console.log(testData);
-})();
+
+  const datas = new Asset(data);
+  testData.assets.push(datas);
+  await testData.save();
+  await datas.save();
+};
 
 /////////////////////////////////
 const {
@@ -25,16 +36,28 @@ let tempState = {}; // For holding temporary value when adding a stock before co
 
 const dt = new Date(); // for checking last update
 
-const updatePrice = async function (companyName, index, curTime) {
+const updatePrice = async function (
+  companyName,
+  index,
+  curTime,
+  testDataAssets
+) {
   const { currentPrice } = await getCurrentPrice(companyName);
 
-  testData[index].currentPrice = currentPrice;
-  testData[index].totalValue = currentPrice * testData[index].noOfStock;
-  testData[index].updateTime = curTime;
+  testDataAssets[index].currentPrice = currentPrice;
+  testDataAssets[index].totalValue =
+    currentPrice * testDataAssets[index].noOfStock;
+  testDataAssets[index].updateTime = curTime;
   // Testing purpose: Adding stock and finding value
 
-  const result = stockCalculation.findPercentage(testData, currentPrice, index);
-  testData[index].pAndLossPerc = result;
+  const result = stockCalculation.findPercentage(
+    testDataAssets,
+    currentPrice,
+    index
+  );
+  testDataAssets[index].pAndLossPerc = result;
+  console.log(testDataAssets[index]);
+  await setTestData(testDataAssets[index]);
 };
 
 async function getSymbol(companyName) {
@@ -63,51 +86,85 @@ router.route("/trial").get((req, res) => {
 router
   .route("/portfolio")
   .get(async (req, res) => {
+    const testDataAssets = await getTestDatas();
     const curTime = dt.getTime();
 
-    for (let i = 0; i < testData.length; i++) {
-      const timeDiff = curTime - testData[i].updateTime;
-      if (testData[i].isCustomAsset || timeDiff < MILLISECOND) continue;
+    for (let i = 0; i < testDataAssets.length; i++) {
+      const timeDiff = curTime - testDataAssets[i].updateTime;
+      console.log(testDataAssets[i]);
+      console.log("here");
+      if (testDataAssets[i].isCustomAsset || timeDiff < MILLISECOND) continue;
 
-      await updatePrice(testData[i].stockName, i, curTime);
+      await updatePrice(
+        testDataAssets[i].stockName,
+        i,
+        curTime,
+        testDataAssets
+      );
     }
-    console.log(testData);
+
+    let i = 0;
+    let topGainers = [];
+    console.log(testDataAssets);
+    const datasPerformer = testDataAssets
+      .map((company) => {
+        return {
+          value: company.pAndLossPerc,
+          name: company.stockName,
+        };
+      })
+      .sort((a, b) => b.value - a.value);
+
+    for (let value of datasPerformer) {
+      if (i === 3) break;
+      topGainers.push({ ...value, i });
+      i++;
+    }
+
+    console.log(topGainers);
     res.render("portfolio", {
       pageClass: "portfolioPage",
       showLogin: false,
       showReg: false,
       titleName: "Portfolio",
-      testData,
-      stockLabel: testData.map((data) => data.stockName),
-      stockValue: testData.map((data) => data.totalValue),
+      testData: testDataAssets,
+      stockLabel: testDataAssets.map((data) => data.stockName),
+      stockValue: testDataAssets.map((data) => data.totalValue),
+      topGainers,
     });
   })
   .post(async (req, res) => {
     if (req.body.action !== "cancel") {
-      if (tempState.index === testData.length) {
-        testData.push({
+      if (tempState.index === testDataAssets.length) {
+        testDataAssets.push({
           ...tempState,
         });
       } else {
         const { index, noOfStock, stockName, currentPrice } = tempState;
-        testData[index].noOfStock = +testData[index].noOfStock + +noOfStock;
-        testData[index].investedAmount =
-          testData[index].investedAmount + currentPrice * noOfStock;
-        testData[index].totalValue =
-          testData[index].totalValue + currentPrice * noOfStock;
+        testDataAssets[index].noOfStock =
+          +testDataAssets[index].noOfStock + +noOfStock;
+        testDataAssets[index].investedAmount =
+          testDataAssets[index].investedAmount + currentPrice * noOfStock;
+        testDataAssets[index].totalValue =
+          testDataAssets[index].totalValue + currentPrice * noOfStock;
       }
 
       const index = tempState.index;
       const curTime = dt.getTime();
 
-      await updatePrice(testData[index].stockName, index, curTime);
+      if (!testDataAssets[index].isCustomAsset)
+        await updatePrice(testDataAssets[index].stockName, index, curTime);
     }
+
+    testData.assets.push(testDataAssets);
+    await testData.save();
+    await testDataAssets.save();
 
     res.redirect("/portfolio");
   });
 
 router.get("/fakeLogin", async (req, res) => {
-  res.render("fakeChart", { testData });
+  res.render("fakeChart", { testData: testDataAssets });
 });
 
 const buildTempState = function (
@@ -118,6 +175,7 @@ const buildTempState = function (
   isCustomAsset,
   index = -1
 ) {
+  tempState = {};
   let updateTime = index === -1 ? 100 : dt.getTime();
 
   return {
@@ -128,7 +186,7 @@ const buildTempState = function (
     totalValue: stockPrice * noOfStock,
     investedAmount: stockPrice * noOfStock,
     pAndLossPerc: 0,
-    index: index === -1 ? testData.length : index,
+    index: index === -1 ? testDataAssets.length : index,
     symbol,
     isCustomAsset,
     updateTime,
@@ -151,12 +209,10 @@ const normalAssetBuilder = async function (company) {
 
   symbol = symbol.split(".")[0];
 
-  const index = testData.findIndex((stock) => {
-    console.log(stock.symbol);
-    console.log(symbol);
+  const index = testDataAssets.findIndex((stock) => {
     return stock.symbol === symbol;
   });
-  console.log(index);
+
   return buildTempState(
     noOfStock,
     stockPrice,
@@ -172,13 +228,14 @@ const customAssetBuilder = async function (asset) {
   const { companyName, quantity: noOfStock, stockPrice } = asset;
   stockPriceGiven = true;
   symbol = companyName;
+
   return buildTempState(noOfStock, stockPrice, companyName, symbol, true);
 };
 
 router.post("/addStock", async (req, res) => {
   const { format, company, asset } = req.body;
   console.log(req.body);
-  console.log(company);
+  console.log(asset);
   if (format === "NormalAsset") {
     tempState = await normalAssetBuilder(company);
   } else tempState = await customAssetBuilder(asset);
