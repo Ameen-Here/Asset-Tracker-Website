@@ -6,7 +6,6 @@ const app = express();
 const mongoose = require("mongoose");
 
 const User = require("./models/User");
-const Asset = require("./models/Asset");
 
 // Connect to mongoose
 mongoose.connect("mongodb://localhost:27017/asset-tracker", {
@@ -42,3 +41,12 @@ app.use("/", generalRoute);
 app.use("/", stockRoute);
 
 app.listen(3000, () => console.log("Listening to port 3000"));
+
+// async function updateDatas(name, stockName, noOfStock, currentPrice) {
+//   const user = await User.findOne({ name });
+//   const assetValues = user.assets.filter(
+//     (asset) => asset.stockName === stockName
+//   );
+//   console.log(assetValues);
+//   // user.update({ "assets.stockName": stockName }, {});
+// }

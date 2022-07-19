@@ -2,16 +2,13 @@ const express = require("express");
 const router = express.Router();
 
 const User = require("../models/User");
-const Asset = require("../models/Asset");
 
 const { MILLISECOND } = require("../Utility Functions/testData");
 
 // TESTING DATAS
 
 const getTestDatas = async () => {
-  const testData = await User.findOne({ name: "Ameen Noushad" }).populate(
-    "assets"
-  );
+  const testData = await User.findOne({ name: "Ameen Noushad" });
   return testData.assets;
 };
 
@@ -19,10 +16,8 @@ const setTestData = async (data) => {
   const testData = await User.findOne({ name: "Ameen Noushad" });
   console.log(testData);
 
-  const datas = new Asset(data);
-  testData.assets.push(datas);
+  testData.assets.push(data);
   await testData.save();
-  await datas.save();
 };
 
 /////////////////////////////////
@@ -74,39 +69,73 @@ async function getCurrentPrice(companyName) {
   };
 }
 
-router.route("/trial").get((req, res) => {
-  res.render("trailAddStock", {
-    pageClass: "portfolioPage",
-    showLogin: false,
-    showReg: false,
-    titleName: "Portfolio",
+async function updateDatas(name, symbol, noOfStock, currentPrice) {
+  const user = await User.findOne({ name });
+  console.log(user);
+  console.log("asdasdasd");
+  const assetValues = user.assets.filter((asset) => {
+    return asset.symbol === symbol;
+  })[0];
+
+  noOfStock += +assetValues.noOfStock;
+  const investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
+  const totalValue = assetValues.totalValue + currentPrice * noOfStock;
+
+  const testStockPrice = investedAmount / noOfStock;
+
+  let pAndLossPerc;
+  if (currentPrice - testStockPrice < 0) {
+    pAndLossPerc = -((testStockPrice - currentPrice) / testStockPrice);
+  } else {
+    pAndLossPerc = (currentPrice - testStockPrice) / testStockPrice;
+  }
+
+  const data = {
+    ...tempState,
+    noOfStock,
+    investedAmount,
+    totalValue,
+    testStockPrice,
+    pAndLossPerc,
+  };
+
+  console.log("This One");
+  console.log(data);
+
+  const updatingIndex = user.assets.findIndex((asset) => {
+    console.log(asset.symbol);
+    console.log(symbol);
+    return asset.symbol === symbol;
   });
-});
+
+  console.log(updatingIndex);
+
+  user.assets.splice(updatingIndex, 1, data);
+
+  console.log(user);
+
+  await user.save();
+
+  console.log(user);
+  console.log(User);
+}
 
 router
   .route("/portfolio")
   .get(async (req, res) => {
-    const testDataAssets = await getTestDatas();
+    const userAssets = await getTestDatas();
     const curTime = dt.getTime();
 
-    for (let i = 0; i < testDataAssets.length; i++) {
-      const timeDiff = curTime - testDataAssets[i].updateTime;
-      console.log(testDataAssets[i]);
-      console.log("here");
-      if (testDataAssets[i].isCustomAsset || timeDiff < MILLISECOND) continue;
+    for (let i = 0; i < userAssets.length; i++) {
+      const timeDiff = curTime - userAssets[i].updateTime;
+      if (userAssets[i].isCustomAsset || timeDiff < MILLISECOND) continue;
 
-      await updatePrice(
-        testDataAssets[i].stockName,
-        i,
-        curTime,
-        testDataAssets
-      );
+      await updatePrice(userAssets[i].stockName, i, curTime, userAssets);
     }
 
     let i = 0;
     let topGainers = [];
-    console.log(testDataAssets);
-    const datasPerformer = testDataAssets
+    const datasPerformer = userAssets
       .map((company) => {
         return {
           value: company.pAndLossPerc,
@@ -121,46 +150,45 @@ router
       i++;
     }
 
-    console.log(topGainers);
     res.render("portfolio", {
       pageClass: "portfolioPage",
       showLogin: false,
       showReg: false,
       titleName: "Portfolio",
-      testData: testDataAssets,
-      stockLabel: testDataAssets.map((data) => data.stockName),
-      stockValue: testDataAssets.map((data) => data.totalValue),
+      testData: userAssets,
+      stockLabel: userAssets.map((data) => data.stockName),
+      stockValue: userAssets.map((data) => data.totalValue),
       topGainers,
     });
   })
   .post(async (req, res) => {
+    const userAssets = await getTestDatas();
+    console.log(userAssets);
+    console.log("/////////////////");
     if (req.body.action !== "cancel") {
-      if (tempState.index === testDataAssets.length) {
-        testDataAssets.push({
-          ...tempState,
-        });
-      } else {
-        const { index, noOfStock, stockName, currentPrice } = tempState;
-        testDataAssets[index].noOfStock =
-          +testDataAssets[index].noOfStock + +noOfStock;
-        testDataAssets[index].investedAmount =
-          testDataAssets[index].investedAmount + currentPrice * noOfStock;
-        testDataAssets[index].totalValue =
-          testDataAssets[index].totalValue + currentPrice * noOfStock;
-      }
-
-      const index = tempState.index;
       const curTime = dt.getTime();
 
-      if (!testDataAssets[index].isCustomAsset)
-        await updatePrice(testDataAssets[index].stockName, index, curTime);
+      const { index, noOfStock, symbol, currentPrice } = tempState;
+
+      await updateDatas(
+        "Ameen Noushad",
+        symbol,
+        +noOfStock,
+        currentPrice,
+        curTime
+      );
     }
 
-    testData.assets.push(testDataAssets);
-    await testData.save();
-    await testDataAssets.save();
+    //   if (!tempState.isCustomAsset)
+    //     await updatePrice(testDataAssets[index].stockName, index, curTime);
+    // }
 
-    res.redirect("/portfolio");
+    // testData.assets.push(testDataAssets);
+    // await testData.save();
+    // await testDataAssets.save();
+
+    // res.redirect("/portfolio");
+    res.send("ok");
   });
 
 router.get("/fakeLogin", async (req, res) => {
@@ -173,6 +201,7 @@ const buildTempState = function (
   companyName,
   symbol,
   isCustomAsset,
+  testDataAssets,
   index = -1
 ) {
   tempState = {};
@@ -186,7 +215,7 @@ const buildTempState = function (
     totalValue: stockPrice * noOfStock,
     investedAmount: stockPrice * noOfStock,
     pAndLossPerc: 0,
-    index: index === -1 ? testDataAssets.length : index,
+    index: index === -1 ? +testDataAssets.length : index,
     symbol,
     isCustomAsset,
     updateTime,
@@ -194,6 +223,7 @@ const buildTempState = function (
 };
 
 const normalAssetBuilder = async function (company) {
+  const userAssets = await getTestDatas();
   // The normal functions
   let symbol, stockPrice;
   const { companyName, quantity: noOfStock, isStockPrice } = company;
@@ -209,7 +239,7 @@ const normalAssetBuilder = async function (company) {
 
   symbol = symbol.split(".")[0];
 
-  const index = testDataAssets.findIndex((stock) => {
+  const index = userAssets.findIndex((stock) => {
     return stock.symbol === symbol;
   });
 
@@ -219,23 +249,31 @@ const normalAssetBuilder = async function (company) {
     companyName,
     symbol,
     false,
+    userAssets,
     index
   );
 };
 
 const customAssetBuilder = async function (asset) {
+  const testDataAssets = await getTestDatas();
   // assetFunctions
   const { companyName, quantity: noOfStock, stockPrice } = asset;
   stockPriceGiven = true;
   symbol = companyName;
 
-  return buildTempState(noOfStock, stockPrice, companyName, symbol, true);
+  return buildTempState(
+    noOfStock,
+    stockPrice,
+    companyName,
+    symbol,
+    testDataAssets,
+    true
+  );
 };
 
 router.post("/addStock", async (req, res) => {
   const { format, company, asset } = req.body;
-  console.log(req.body);
-  console.log(asset);
+
   if (format === "NormalAsset") {
     tempState = await normalAssetBuilder(company);
   } else tempState = await customAssetBuilder(asset);
@@ -251,47 +289,3 @@ router.post("/addStock", async (req, res) => {
   });
 });
 module.exports = router;
-
-//////////////////////////////////////////////////
-// ShowStock and addStock routings.
-
-// app.get("/showStock", async (req, res) => {
-//   const companyName = testData[curStock].stockName;
-
-//   const result = await findPercentage(companyName);
-
-//   testData[curStock].totalValue =
-//     testData[curStock].currentPrice * testData[curStock].noOfStock;
-
-//   res.send(
-//     `<h1>Company Name: ${testData[curStock].stockName}</h1><h2>Current Price: ${testData[curStock].currentPrice}</h2>
-//     <h2>Total:${testData[curStock].totalValue}     <i style="color:green;">P/L: ${testData[curStock].pAndLossPerc}% </i></h2>`
-//   );
-// });
-
-// Delete Function
-// app.get("/delete", async (req, res) => {
-//   console.log(testData[curStock]);
-//   const quantity = 3;
-
-//   const companyName = testData[curStock].stockName;
-//   const companyDetailsFull = await fetchCurReport(companyName);
-//   console.log(companyDetailsFull);
-//   const currentPrice = companyDetailsFull["Global Quote"]["05. price"];
-
-//   const amountWithdraw = quantity * currentPrice;
-
-//   testData[curStock].noOfStock -= quantity;
-
-//   testData[curStock].totalValue =
-//     testData[curStock].totalValue - currentPrice * quantity;
-
-//   testData[curStock].investedAmount =
-//     testData[curStock].investedAmount -
-//     quantity * testData[curStock].testStockPrice;
-
-//   const result = await findPercentage(companyName, true);
-//   testData[curStock].pAndLossPerc = result;
-//   console.log(testData[curStock]);
-//   res.send("ok");
-// });
