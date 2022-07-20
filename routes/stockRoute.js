@@ -5,6 +5,13 @@ const User = require("../models/User");
 
 const { MILLISECOND } = require("../Utility Functions/testData");
 
+/////////////////////////////////
+const {
+  fetchCurReport,
+  fetchSymbol,
+} = require("../Utility Functions/apiHelperFn");
+const stockCalculation = require("../Utility Functions/stockCalc");
+
 // TESTING DATAS
 
 const getTestDatas = async () => {
@@ -14,19 +21,10 @@ const getTestDatas = async () => {
 
 const setTestData = async (data) => {
   const testData = await User.findOne({ name: "Ameen Noushad" });
-  console.log(testData);
 
   // testData.assets.push(data);
   await testData.save();
-  console.log(testData);
 };
-
-/////////////////////////////////
-const {
-  fetchCurReport,
-  fetchSymbol,
-} = require("../Utility Functions/apiHelperFn");
-const stockCalculation = require("../Utility Functions/stockCalc");
 
 let tempState = {}; // For holding temporary value when adding a stock before confirmation
 
@@ -38,22 +36,23 @@ const updatePrice = async function (
   curTime,
   testDataAssets
 ) {
-  const { currentPrice } = await getCurrentPrice(companyName);
+  const { currentPrice } = await getCurPriceAndStock(companyName);
 
+  // Updating Values
   testDataAssets[index].currentPrice = currentPrice;
   testDataAssets[index].totalValue =
     currentPrice * testDataAssets[index].noOfStock;
   testDataAssets[index].updateTime = curTime;
-  // Testing purpose: Adding stock and finding value
 
+  // Getting P/L value
   const result = stockCalculation.findPercentage(
     testDataAssets,
     currentPrice,
     index
   );
   testDataAssets[index].pAndLossPerc = result;
-  console.log(testDataAssets[index]);
-  await setTestData(testDataAssets[index]);
+
+  await setTestData();
 };
 
 async function getSymbol(companyName) {
@@ -61,76 +60,78 @@ async function getSymbol(companyName) {
   if (!companyDetailsFull) return res.send("error");
 }
 
-async function getCurrentPrice(companyName) {
+async function getCurPriceAndStock(companyName) {
   const companyDetailsFull = await fetchCurReport(companyName);
-  if (!companyDetailsFull) return res.send("error");
+  if (!companyDetailsFull) return;
   return {
     currentPrice: companyDetailsFull["Global Quote"]["05. price"],
     symbol: companyDetailsFull["Global Quote"]["01. symbol"],
   };
 }
 
-async function updateDatas(name, symbol, noOfStock, currentPrice, companyName) {
+async function updateAsset(assetValues, noOfStock, currentPrice, companyName) {
+  noOfStock += +assetValues.noOfStock;
+  investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
+
+  const testStockPrice = investedAmount / noOfStock;
+
+  ({ currentPrice } = await getCurPriceAndStock(companyName));
+
+  totalValue = noOfStock * currentPrice;
+
+  if (currentPrice - testStockPrice < 0) {
+    pAndLossPerc = -((testStockPrice - currentPrice) / testStockPrice) * 100;
+  } else {
+    pAndLossPerc = ((currentPrice - testStockPrice) / testStockPrice) * 100;
+  }
+
+  return {
+    ...tempState,
+    noOfStock,
+    investedAmount,
+    totalValue,
+    testStockPrice,
+    pAndLossPerc,
+    currentPrice,
+  };
+}
+
+async function createNewAsset(currentPrice) {
+  return { ...tempState, testStockPrice: currentPrice };
+}
+
+async function updateDataBase(
+  name,
+  symbol,
+  noOfStock,
+  currentPrice,
+  companyName
+) {
   const user = await User.findOne({ name });
 
+  // Getting value of assets if it exists
   const assetValues = user.assets.filter((asset) => {
     return asset.symbol === symbol;
   })[0];
+
+  // To store the final data to store into db
   let data = {};
 
-  if (!assetValues) {
-    const testStockPrice = currentPrice;
-    data = {
-      ...tempState,
-      testStockPrice,
-    };
-  } else {
-    noOfStock += +assetValues.noOfStock;
-    investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
+  if (!assetValues) data = createNewAsset(currentPrice);
+  else data = updateAsset(assetValues, noOfStock, currentPrice, companyName);
 
-    const testStockPrice = investedAmount / noOfStock;
-
-    console.log(companyName);
-
-    ({ currentPrice } = await getCurrentPrice(companyName));
-
-    totalValue = noOfStock * currentPrice;
-
-    if (currentPrice - testStockPrice < 0) {
-      pAndLossPerc = -((testStockPrice - currentPrice) / testStockPrice) * 100;
-    } else {
-      pAndLossPerc = ((currentPrice - testStockPrice) / testStockPrice) * 100;
-    }
-
-    console.log(pAndLossPerc);
-    data = {
-      ...tempState,
-      noOfStock,
-      investedAmount,
-      totalValue,
-      testStockPrice,
-      pAndLossPerc,
-      currentPrice,
-    };
-
-    console.log(data);
-  }
-
-  console.log(data);
-
+  // Searching for the index
   const updatingIndex = user.assets.findIndex((asset) => {
     return asset.symbol === symbol;
   });
 
-  console.log(updatingIndex);
-
+  // Updating asset or adding new asset
   if (updatingIndex === -1) {
     user.assets.push(data);
   } else {
     user.assets.splice(updatingIndex, 1, data);
   }
 
-  console.log(user);
   await user.save();
 }
 
@@ -138,15 +139,17 @@ router
   .route("/portfolio")
   .get(async (req, res) => {
     const userAssets = await getTestDatas();
-    const curTime = dt.getTime();
+    const curTime = dt.getTime(); // Getting current time to determine whether to update or not
 
     for (let i = 0; i < userAssets.length; i++) {
+      // Checking if assets need to be updated or not
       const timeDiff = curTime - userAssets[i].updateTime;
       if (userAssets[i].isCustomAsset || timeDiff < MILLISECOND) continue;
 
       await updatePrice(userAssets[i].stockName, i, curTime, userAssets);
     }
 
+    // Values to render top gainers
     let i = 0;
     let topGainers = [];
     const datasPerformer = userAssets
@@ -177,15 +180,13 @@ router
   })
   .post(async (req, res) => {
     const userAssets = await getTestDatas();
-    console.log(userAssets);
-    console.log(tempState);
-    console.log("/////////////////");
+
     if (req.body.action !== "cancel") {
       const curTime = dt.getTime();
 
       const { noOfStock, symbol, currentPrice, stockName } = tempState;
 
-      await updateDatas(
+      await updateDataBase(
         "Ameen Noushad",
         symbol,
         +noOfStock,
@@ -194,21 +195,8 @@ router
       );
     }
 
-    //   if (!tempState.isCustomAsset)
-    //     await updatePrice(testDataAssets[index].stockName, index, curTime);
-    // }
-
-    // testData.assets.push(testDataAssets);
-    // await testData.save();
-    // await testDataAssets.save();
-
     res.redirect("/portfolio");
-    // res.send("ok");
   });
-
-// router.get("/fakeLogin", async (req, res) => {
-//   res.render("fakeChart", { testData: testDataAssets });
-// });
 
 const buildTempState = function (
   noOfStock,
@@ -245,7 +233,9 @@ const normalAssetBuilder = async function (company) {
   const stockPriceGiven = isStockPrice == "true";
   if (!stockPriceGiven) {
     // Getting current updates of the particular stock
-    ({ currentPrice: stockPrice, symbol } = await getCurrentPrice(companyName));
+    ({ currentPrice: stockPrice, symbol } = await getCurPriceAndStock(
+      companyName
+    ));
   } else {
     ({ stockPrice } = company);
     symbol = await fetchSymbol(companyName);
