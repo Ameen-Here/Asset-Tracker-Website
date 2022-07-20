@@ -5,7 +5,6 @@ const User = require("../models/User");
 
 const { MILLISECOND } = require("../Utility Functions/testData");
 
-/////////////////////////////////
 const {
   fetchCurReport,
   fetchSymbol,
@@ -22,9 +21,10 @@ const getTestDatas = async () => {
 const setTestData = async (data) => {
   const testData = await User.findOne({ name: "Ameen Noushad" });
 
-  // testData.assets.push(data);
   await testData.save();
 };
+
+/////////////////////////////////
 
 let tempState = {}; // For holding temporary value when adding a stock before confirmation
 
@@ -36,7 +36,7 @@ const updatePrice = async function (
   curTime,
   testDataAssets
 ) {
-  const { currentPrice } = await getCurPriceAndStock(companyName);
+  const { currentPrice } = await getCurrPriceAndSymbol(companyName);
 
   // Updating Values
   testDataAssets[index].currentPrice = currentPrice;
@@ -51,18 +51,12 @@ const updatePrice = async function (
     index
   );
   testDataAssets[index].pAndLossPerc = result;
-
-  await setTestData();
+  await setTestData(testDataAssets[index]);
 };
 
-async function getSymbol(companyName) {
+async function getCurrPriceAndSymbol(companyName) {
   const companyDetailsFull = await fetchCurReport(companyName);
   if (!companyDetailsFull) return res.send("error");
-}
-
-async function getCurPriceAndStock(companyName) {
-  const companyDetailsFull = await fetchCurReport(companyName);
-  if (!companyDetailsFull) return;
   return {
     currentPrice: companyDetailsFull["Global Quote"]["05. price"],
     symbol: companyDetailsFull["Global Quote"]["01. symbol"],
@@ -75,7 +69,7 @@ async function updateAsset(assetValues, noOfStock, currentPrice, companyName) {
 
   const testStockPrice = investedAmount / noOfStock;
 
-  ({ currentPrice } = await getCurPriceAndStock(companyName));
+  ({ currentPrice } = await getCurrPriceAndSymbol(companyName));
 
   totalValue = noOfStock * currentPrice;
 
@@ -117,8 +111,9 @@ async function updateDataBase(
   // To store the final data to store into db
   let data = {};
 
-  if (!assetValues) data = createNewAsset(currentPrice);
-  else data = updateAsset(assetValues, noOfStock, currentPrice, companyName);
+  if (!assetValues) data = await createNewAsset(currentPrice);
+  else
+    data = await updateAsset(assetValues, noOfStock, currentPrice, companyName);
 
   // Searching for the index
   const updatingIndex = user.assets.findIndex((asset) => {
@@ -233,7 +228,7 @@ const normalAssetBuilder = async function (company) {
   const stockPriceGiven = isStockPrice == "true";
   if (!stockPriceGiven) {
     // Getting current updates of the particular stock
-    ({ currentPrice: stockPrice, symbol } = await getCurPriceAndStock(
+    ({ currentPrice: stockPrice, symbol } = await getCurrPriceAndSymbol(
       companyName
     ));
   } else {
