@@ -11,7 +11,7 @@
         <div class="asset-left">
           <p><%= company.stockName %></p>
           <p class="text-muted">
-            <%= company.noOfStock %> x Rs.<%= company.testStockPrice %>
+            <%= company.noOfStock %> x Rs.<%= (company.testStockPrice * 1).toFixed(2) %>
           </p>
           <p>Current Price: <%= (company.currentPrice * 1).toFixed(2) %></p>
         </div>
@@ -21,7 +21,7 @@
             style="color: <%= company.totalValue - company.investedAmount >= 0? 'green':'red' %> "
           >
             P/L: Rs<%= ((company.totalValue - company.investedAmount) *
-            1).toFixed(2) %> (<%= company.pAndLossPerc %> %)
+            1).toFixed(2) %> (<%= (company.pAndLossPerc * 1).toFixed(2) %> %)
           </p>
         </div>
       </div>
