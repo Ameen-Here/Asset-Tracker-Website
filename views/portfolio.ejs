@@ -172,7 +172,7 @@
       <% for(let company of topGainers) { %>   
       <li class="performer"> 
         <%= company.i + 1 %> <%= company.name %> 
-        <div class="value-asset " style="color: <%= company.value >= 0? 'green':'red' %> "> <%= company.value %>%</div>
+        <div class="value-asset " style="color: <%= company.value >= 0? 'green':'red' %> "> <%= (company.value * 1).toFixed(2) %>%</div>
       </li>
       <% } %> 
      
