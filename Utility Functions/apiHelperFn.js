@@ -11,7 +11,7 @@ const fetchSymbol = async function (companyName) {
   return symbol;
 };
 
-const fetchCurReport = async function (companyName) {
+const fetchCurPriceSymbol = async function (companyName) {
   const symbol = await fetchSymbol(companyName);
   if (!symbol) return;
   const companyDetails = await axios.get(
@@ -19,12 +19,16 @@ const fetchCurReport = async function (companyName) {
       symbol.split(".")[0]
     }.BSE&apikey=7EGYOYYJ63SX9WO9`
   ); // Getting company stock price and details.
-  // console.log(companyDetails.data);
   const companyDetailsFull = companyDetails.data;
-  return companyDetailsFull;
+  console.log("*");
+  console.log(companyDetailsFull);
+  if (!companyDetailsFull) return { currentPrice: null, symbol: null };
+  return {
+    currentPrice: companyDetailsFull["Global Quote"]["05. price"],
+    symbol: companyDetailsFull["Global Quote"]["01. symbol"],
+  };
 };
 
 module.exports = {
-  fetchCurReport,
-  fetchSymbol,
+  fetchCurPriceSymbol,
 };
