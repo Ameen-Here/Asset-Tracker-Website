@@ -1,31 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
-router.route("/").get((req, res) => {
-  res.render("index", {
-    pageClass: "homepage",
-    showLogin: true,
-    showReg: true,
-    titleName: "Home Page",
-  });
-});
+const { homepage, login, register } = require("../controller/loginRegister");
 
-router.get("/login", (req, res) => {
-  res.render("login", {
-    pageClass: "loginPage",
-    showLogin: false,
-    showReg: true,
-    titleName: "Login",
-  });
-});
+router.get("/", homepage);
 
-router.get("/register", (req, res) => {
-  res.render("register", {
-    pageClass: "registerPage",
-    showLogin: true,
-    showReg: false,
-    titleName: "Register",
-  });
-});
+router.get("/login", login);
+
+router.get("/register", register);
 
 module.exports = router;

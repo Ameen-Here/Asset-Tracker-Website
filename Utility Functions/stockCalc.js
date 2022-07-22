@@ -1,5 +1,3 @@
-// const { testData } = require("./testData");
-
 const findPercentage = function (stockPrice, currentPrice) {
   let result; // Getting current price from the details
   if (currentPrice - stockPrice < 0) {
@@ -10,4 +8,20 @@ const findPercentage = function (stockPrice, currentPrice) {
   return result.toFixed(3); // Reducing to 3 decimal places
 };
 
-module.exports = { findPercentage };
+const calcTestStockPrice = (investedAmount, noOfStock) =>
+  investedAmount / noOfStock;
+
+const calcTotalValue = (curPrice, noOfStock) => curPrice * noOfStock;
+
+const getIndex = (datas, symbol) => {
+  return datas.assets.findIndex((stock) => {
+    return stock.symbol === symbol;
+  });
+};
+
+module.exports = {
+  findPercentage,
+  calcTestStockPrice,
+  getIndex,
+  calcTotalValue,
+};

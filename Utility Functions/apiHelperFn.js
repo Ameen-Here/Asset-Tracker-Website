@@ -20,8 +20,6 @@ const fetchCurPriceSymbol = async function (companyName) {
     }.BSE&apikey=7EGYOYYJ63SX9WO9`
   ); // Getting company stock price and details.
   const companyDetailsFull = companyDetails.data;
-  console.log("*");
-  console.log(companyDetailsFull);
   if (!companyDetailsFull) return { currentPrice: null, symbol: null };
   return {
     currentPrice: companyDetailsFull["Global Quote"]["05. price"],

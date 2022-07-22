@@ -1,7 +1,10 @@
 // Template Builder
-const { getTestDatas, getIndex } = require("./userData");
+const { getTestDatas } = require("../models/userHandler");
 // To get current price & symbol of the company: Indian stocks
 const { fetchCurPriceSymbol } = require("../Utility Functions/apiHelperFn");
+
+const { getIndex } = require("../Utility Functions/stockCalc");
+const dt = new Date();
 
 const buildTempState = function (
   noOfStock,
@@ -51,8 +54,6 @@ const normalAssetBuilder = async function (company, tempState) {
   symbol = symbol.split(".")[0];
   const index = getIndex(testData, symbol);
 
-  console.log(index);
-
   return buildTempState(
     noOfStock,
     stockPrice,
@@ -71,8 +72,6 @@ const customAssetBuilder = async function (asset, tempState) {
   const { companyName, quantity: noOfStock, stockPrice } = asset;
   stockPriceGiven = true;
   symbol = companyName;
-
-  console.log(testData);
 
   const index = getIndex(testData, symbol);
   return buildTempState(
