@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const { removeCurrentUser } = require("../config/currentUser");
+
 const User = require("../models/User");
 const passport = require("passport");
 
@@ -51,6 +53,7 @@ router.get("/logout", (req, res) => {
     if (err) {
       return next(err);
     }
+    removeCurrentUser();
     // req.flash('success', "Goodbye!");
     res.redirect("/");
   });

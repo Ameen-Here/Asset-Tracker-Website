@@ -22,8 +22,8 @@ let tempState = {}; // For holding temporary value when adding a stock before co
 // Controllers
 
 const showPortfolio = async (req, res) => {
-  // const currentUserEmail = req.user.email;
-  const testData = await getTestDatas();
+  const currentUserEmail = req.user.email;
+  const testData = await getTestDatas(currentUserEmail);
   setCurrentUser(testData);
   const assets = testData.assets;
   await updatePortfolioAssets(testData); // Will update stock price if needed

@@ -4,7 +4,7 @@ const setCurrentUser = function (testDatas) {
   currentUser = testDatas;
 };
 
-const removeCurrentUser = function (testData) {
+const removeCurrentUser = function () {
   currentUser = undefined;
 };
 
