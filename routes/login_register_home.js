@@ -21,7 +21,7 @@ router
       failureRedirect: "/login",
     }),
     (req, res) => {
-      // req.flash("success", "welcome back")
+      req.flash("success", "Welcome back to AssetTracker");
       res.redirect("/portfolio");
     }
   );
@@ -39,10 +39,11 @@ router
 
       req.login(registeredUser, (err) => {
         if (err) return next(err);
-        // req.flash("success", "welcome to AssetTracker");
+        req.flash("success", "welcome to AssetTracker");
         res.redirect("/portfolio");
       });
     } catch (e) {
+      req.flash("error", "User/Email already existed.");
       res.redirect("/register");
     }
   });
@@ -54,7 +55,7 @@ router.get("/logout", (req, res) => {
       return next(err);
     }
     removeCurrentUser();
-    // req.flash('success', "Goodbye!");
+    req.flash("success", "See you later");
     res.redirect("/");
   });
 });

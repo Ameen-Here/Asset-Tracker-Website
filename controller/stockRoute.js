@@ -4,6 +4,8 @@ const { setCurrentUser } = require("../config/currentUser");
 
 const { normalAssetBuilder, customAssetBuilder } = require("./templateBuilder");
 
+const catchAsync = require("../Utility Functions/errorHandler");
+
 const {
   updatePortfolioAssets,
   renderPortfolioLists,
@@ -21,7 +23,7 @@ let tempState = {}; // For holding temporary value when adding a stock before co
 
 // Controllers
 
-const showPortfolio = async (req, res) => {
+const showPortfolio = catchAsync(async (req, res) => {
   const currentUserEmail = req.user.email;
   const testData = await getTestDatas(currentUserEmail);
   setCurrentUser(testData);
@@ -39,9 +41,9 @@ const showPortfolio = async (req, res) => {
     stockValue: assets.map((data) => data.totalValue),
     topGainers,
   });
-};
+});
 
-const addAsset = async (req, res) => {
+const addAsset = catchAsync(async (req, res) => {
   if (req.body.action === "cancel") return; // Check if the user pressed cancel.
 
   const { noOfStock, symbol, currentPrice, stockName } = tempState;
@@ -57,9 +59,8 @@ const addAsset = async (req, res) => {
   );
 
   res.redirect("/portfolio");
-};
-
-const addStock = async (req, res) => {
+});
+const addStock = catchAsync(async (req, res) => {
   const { format, company, asset } = req.body;
 
   if (format === "NormalAsset") {
@@ -75,7 +76,7 @@ const addStock = async (req, res) => {
     showReg: false,
     titleName: "CONFIRM!!!",
   });
-};
+});
 
 module.exports = {
   showPortfolio,

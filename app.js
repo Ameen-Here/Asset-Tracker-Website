@@ -5,11 +5,13 @@ const app = express();
 
 const mongoose = require("mongoose");
 const session = require("express-session");
+const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/User");
 
 const { fetchSymbol } = require("./Utility Functions/apiHelperFn");
+const AppError = require("./AppError");
 
 // Connect to mongoose
 mongoose.connect("mongodb://localhost:27017/asset-tracker", {
@@ -51,6 +53,7 @@ const sessionConfig = {
 };
 
 app.use(session(sessionConfig));
+app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -61,8 +64,8 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(async (req, res, next) => {
   res.locals.currentUser = req.user;
-  // res.locals.success = req.flash("success");
-  // res.locals.error = req.flash("error");
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
   next();
 });
 
@@ -73,9 +76,28 @@ app.use("/", generalRoute);
 
 app.use("/", stockRoute);
 
-app.get("/test", async (req, res) => {
-  const symbol = await fetchSymbol("sun tv");
-  res.send("ok");
+app.get("/test", (req, res) => {
+  throw new AppError("password required", 401);
+  // const symbol = await fetchSymbol("sun tv");
+  // res.send("ok");
+});
+
+// Eror Handling
+app.use((req, res) => {
+  req.flash("error", "The url is not accessible!!!");
+  res.redirect("/");
+});
+
+app.use((err, req, res, next) => {
+  const { status = 500, message = "Something Went Wrong" } = err;
+  if (err.message === "Cannot read properties of undefined (reading 'split')") {
+    req.flash(
+      "error",
+      "Asset name does not found, Make sure the stock name is correct and try again."
+    );
+    return res.redirect("/portfolio");
+  }
+  res.status(status).send(message);
 });
 
 app.listen(3000, () => console.log("Listening to port 3000"));
