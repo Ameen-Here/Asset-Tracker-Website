@@ -2,6 +2,8 @@ const User = require("./User");
 
 const { getIndex } = require("../Utility Functions/stockCalc");
 
+const { getCurrentUser } = require("../config/currentUser");
+
 const { createNewAsset, updateAsset } = require("./databaseHelper");
 
 async function updateDataBase(
@@ -10,9 +12,10 @@ async function updateDataBase(
   noOfStock,
   currentPrice,
   companyName,
-  tempState
+  tempState,
+  currentUser
 ) {
-  const user = await User.findOne({ name });
+  const user = getCurrentUser(currentUser);
 
   // Getting value of assets if it exists
   const assetValues = user.assets.filter((asset) => {
@@ -22,14 +25,14 @@ async function updateDataBase(
   // To store the final data to store into db
   let data = {};
 
-  if (!assetValues) data = await createNewAsset(currentPrice, tempState);
+  if (!assetValues) data = createNewAsset(currentPrice, tempState);
   else
     data = await updateAsset(
       assetValues,
       noOfStock,
       currentPrice,
-      companyName,
-      tempState
+      tempState,
+      symbol
     );
 
   // Searching for the index

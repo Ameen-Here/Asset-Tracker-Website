@@ -12,7 +12,7 @@ const updatePortfolioAssets = async (datas) => {
     const asset = getAsset(datas, i);
     const timeDiff = curTime - asset.updateTime;
     if (asset.isCustomAsset || timeDiff < MILLISECOND) continue;
-    await updatePrice(asset.stockName, i, curTime); // Updating current price and updated time
+    await updatePrice(asset.stockName, i, curTime, asset.symbol, datas); // Updating current price and updated time
   }
 };
 

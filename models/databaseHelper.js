@@ -1,6 +1,6 @@
 const { findPercentage } = require("../Utility Functions/stockCalc");
 
-const { fetchCurPriceSymbol } = require("../Utility Functions/apiHelperFn");
+const { getCurPrice } = require("../Utility Functions/apiHelperFn");
 
 const {
   calcTotalValue,
@@ -9,7 +9,7 @@ const {
 
 const { getTestDatas, getAsset } = require("./userHandler");
 
-const createNewAsset = async function (currentPrice, tempState) {
+const createNewAsset = function (currentPrice, tempState) {
   return { ...tempState, testStockPrice: currentPrice };
 };
 
@@ -17,8 +17,8 @@ const updateAsset = async function (
   assetValues,
   noOfStock,
   currentPrice,
-  companyName,
-  tempState
+  tempState,
+  symbol
 ) {
   // updating invested amount and no of stocks
   investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
@@ -26,7 +26,7 @@ const updateAsset = async function (
 
   // update current stock price and user stock average price
   const testStockPrice = calcTestStockPrice(investedAmount, noOfStock);
-  ({ currentPrice } = await fetchCurPriceSymbol(companyName));
+  ({ currentPrice } = await getCurPrice(symbol));
 
   totalValue = calcTotalValue(noOfStock, currentPrice);
 
@@ -43,9 +43,15 @@ const updateAsset = async function (
   };
 };
 
-const updatePrice = async function (companyName, index, curTime) {
-  const { currentPrice } = await fetchCurPriceSymbol(companyName);
-  const testData = await getTestDatas();
+const updatePrice = async function (
+  companyName,
+  index,
+  curTime,
+  symbol,
+  testData
+) {
+  // Symbol we already have
+  const { currentPrice } = await getCurPrice(symbol);
   const asset = getAsset(testData, index);
 
   // Updating Values

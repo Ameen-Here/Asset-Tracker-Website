@@ -1,7 +1,9 @@
 // Template Builder
 const { getTestDatas } = require("../models/userHandler");
 // To get current price & symbol of the company: Indian stocks
-const { fetchCurPriceSymbol } = require("../Utility Functions/apiHelperFn");
+const { getCurPrice, getSymbol } = require("../Utility Functions/apiHelperFn");
+
+const { getCurrentUser } = require("../config/currentUser");
 
 const { getIndex } = require("../Utility Functions/stockCalc");
 const dt = new Date();
@@ -34,20 +36,21 @@ const buildTempState = function (
   };
 };
 
-const normalAssetBuilder = async function (company, tempState) {
-  const testData = await getTestDatas();
+const normalAssetBuilder = async function (company, tempState, currentUser) {
+  const testData = getCurrentUser(currentUser);
+
   let symbol, stockPrice;
+
   const { companyName, quantity: noOfStock, isStockPrice } = company;
   const stockPriceGiven = isStockPrice == "true";
   if (!stockPriceGiven) {
     // Getting current updates of the particular stock
-    ({ currentPrice: stockPrice, symbol } = await fetchCurPriceSymbol(
-      companyName
-    ));
+    ({ symbol } = await getSymbol(companyName));
+    ({ currentPrice: stockPrice } = await getCurPrice(symbol.split(".")[0]));
   } else {
     // Adding given stock price
     ({ stockPrice } = company);
-    ({ symbol } = await fetchCurPriceSymbol(companyName));
+    ({ symbol } = await getSymbol(companyName));
   }
   // If stock already exist, add new assets
 

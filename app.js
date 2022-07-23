@@ -9,6 +9,8 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/User");
 
+const { fetchSymbol } = require("./Utility Functions/apiHelperFn");
+
 // Connect to mongoose
 mongoose.connect("mongodb://localhost:27017/asset-tracker", {
   useNewUrlParser: true,
@@ -24,6 +26,7 @@ db.once("open", () => console.log("Database Connected"));
 // Express Routes
 const generalRoute = require("./routes/login_register_home");
 const stockRoute = require("./routes/stockRoute");
+const { getTestDatas } = require("./models/userHandler");
 
 app.set("view engine", "ejs"); // Setting ejs engine and directory
 app.set("views", path.join(__dirname, "views"));
@@ -56,7 +59,7 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.currentUser = req.user;
   // res.locals.success = req.flash("success");
   // res.locals.error = req.flash("error");
@@ -69,5 +72,10 @@ app.use((req, res, next) => {
 app.use("/", generalRoute);
 
 app.use("/", stockRoute);
+
+app.get("/test", async (req, res) => {
+  const symbol = await fetchSymbol("sun tv");
+  res.send("ok");
+});
 
 app.listen(3000, () => console.log("Listening to port 3000"));

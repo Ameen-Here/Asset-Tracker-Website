@@ -1,5 +1,6 @@
 const { getTestDatas } = require("../models/userHandler");
 const { updateDataBase } = require("../models/dataBaseHandler");
+const { setCurrentUser } = require("../config/currentUser");
 
 const { normalAssetBuilder, customAssetBuilder } = require("./templateBuilder");
 
@@ -21,9 +22,9 @@ let tempState = {}; // For holding temporary value when adding a stock before co
 // Controllers
 
 const showPortfolio = async (req, res) => {
-  const currentUserEmail = req.user.email;
-  const testData = await getTestDatas(currentUserEmail);
-  console.log("this doesnt worked");
+  // const currentUserEmail = req.user.email;
+  const testData = await getTestDatas();
+  setCurrentUser(testData);
   const assets = testData.assets;
   await updatePortfolioAssets(testData); // Will update stock price if needed
   const topGainers = renderPortfolioLists(assets); // Render a list of top 3 stocks
@@ -51,7 +52,8 @@ const addAsset = async (req, res) => {
     +noOfStock,
     currentPrice,
     stockName,
-    tempState
+    tempState,
+    req.user
   );
 
   res.redirect("/portfolio");
@@ -61,7 +63,7 @@ const addStock = async (req, res) => {
   const { format, company, asset } = req.body;
 
   if (format === "NormalAsset") {
-    tempState = await normalAssetBuilder(company, tempState);
+    tempState = await normalAssetBuilder(company, tempState, req.user);
   } else tempState = await customAssetBuilder(asset, tempState);
 
   res.render("addStock", {
