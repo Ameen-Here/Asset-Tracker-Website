@@ -6,10 +6,15 @@
     <h1 class="mb-5">AssetTracker</h1>
     <h3 class="mb-2">Welcome to AssetTracker</h3>
     <p>Your personal financial asset tracker website.</p>
-
+    <% if(!currentUser) {%>
     <form action="/login">
       <button class="main-btn" type="submit">Get Started</button>
     </form>
+    <% }else{ %>
+    <form action="/portfolio">
+      <button class="main-btn" type="submit">Show Assets</button>
+    </form>
+    <% } %>
   </div>
 </main>
 

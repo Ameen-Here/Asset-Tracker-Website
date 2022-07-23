@@ -1,6 +1,6 @@
 const User = require("./User");
-const getTestDatas = async () => {
-  const testData = await User.findOne({ name: "Ameen Noushad" });
+const getTestDatas = async (email) => {
+  const testData = await User.findOne({ email });
   return testData;
 };
 const getAsset = (data, index) => data.assets[index];

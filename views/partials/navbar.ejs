@@ -30,6 +30,7 @@
               
             </ul>
             <ul class="navbar-nav mb-2 mb-lg-0 d-flex">
+              <% if(!currentUser){ %> 
                 <% if(showLogin){ %> 
               <li class="nav-item">
                 <a class="nav-link" href="login">Login</a>
@@ -40,6 +41,11 @@
                 <a class="nav-link" href="/register">Register</a>
               </li>
               <% } %> 
+              <% }else { %> 
+                <li class="nav-item">
+                  <a class="nav-link" href="/logout">Logout</a>
+                </li>
+                <% } %> 
             </ul>
           </div>
         </div>

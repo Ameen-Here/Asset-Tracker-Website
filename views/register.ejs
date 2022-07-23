@@ -1,5 +1,5 @@
 <% layout('/layout/boilerplate.ejs') %>
-<form class="loginForm" action="/">
+<form class="loginForm" action="/register" method="post">
   <div class="card card-bg" style="width: 18rem">
     <div class="card-body">
       <h5 class="card-title">Register</h5>
@@ -10,6 +10,7 @@
           class="form-control"
           id="email"
           placeholder="Email"
+          name="email"
         />
       </div>
       <div class="mb-3">
@@ -19,6 +20,7 @@
           class="form-control"
           id="userId"
           placeholder="username"
+          name="username"
         />
       </div>
       <div class="mb-3">
@@ -28,6 +30,7 @@
           class="form-control"
           id="password"
           placeholder="password"
+          name="password"
         />
         <div id="password" class="form-text">
           We'll never share your credentials with anyone else.

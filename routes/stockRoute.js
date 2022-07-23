@@ -5,12 +5,16 @@ const {
   showPortfolio,
   addAsset,
   addStock,
+  isLoggedIn,
 } = require("../controller/stockRoute");
 
 // Routing for portfolio page and asset adding confirmation page
-router.route("/portfolio").get(showPortfolio).post(addAsset);
+router
+  .route("/portfolio")
+  .get(isLoggedIn, showPortfolio)
+  .post(isLoggedIn, addAsset);
 
 // Routing for adding asset to the database from the confirmation page
-router.post("/addStock", addStock);
+router.post("/addStock", isLoggedIn, addStock);
 
 module.exports = router;

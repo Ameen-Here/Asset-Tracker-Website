@@ -8,12 +8,22 @@ const {
   renderPortfolioLists,
 } = require("./renderHelper");
 
+const isLoggedIn = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    // req.flash("error", "you must be signed in")
+    return res.redirect("/login");
+  }
+  next();
+};
+
 let tempState = {}; // For holding temporary value when adding a stock before confirmation
 
 // Controllers
 
 const showPortfolio = async (req, res) => {
-  const testData = await getTestDatas();
+  const currentUserEmail = req.user.email;
+  const testData = await getTestDatas(currentUserEmail);
+  console.log("this doesnt worked");
   const assets = testData.assets;
   await updatePortfolioAssets(testData); // Will update stock price if needed
   const topGainers = renderPortfolioLists(assets); // Render a list of top 3 stocks
@@ -69,4 +79,5 @@ module.exports = {
   showPortfolio,
   addAsset,
   addStock,
+  isLoggedIn,
 };
