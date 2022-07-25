@@ -74,10 +74,7 @@ const customAssetBuilder = async function (asset, tempState, currentUser) {
   let { companyName, quantity: noOfStock, stockPrice } = asset;
   stockPriceGiven = true;
   symbol = companyName;
-
   stockPrice = +stockPrice;
-  console.log(stockPrice);
-  console.log(typeof stockPrice);
 
   const index = getIndex(testData, symbol);
   return buildTempState(

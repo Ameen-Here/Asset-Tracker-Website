@@ -32,7 +32,6 @@ const updateAsset = async function (
   const testStockPrice = calcTestStockPrice(investedAmount, noOfStock);
   if (!assetValues.isCustomAsset)
     ({ currentPrice } = await getCurPrice(symbol));
-  console.log(currentPrice);
 
   totalValue = calcTotalValue(noOfStock, currentPrice);
 

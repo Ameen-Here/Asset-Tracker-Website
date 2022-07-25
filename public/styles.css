@@ -148,15 +148,15 @@
 } */
 
 .asset {
-  margin-top: 10px;
+  margin-top: 6px;
   background-color: white;
   display: flex;
   padding: 10px;
   padding-top: 4px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   justify-content: space-between;
   border: 1px rgb(61, 60, 60) solid;
-  border-radius: 5px;
+  border-radius: 4px;
   box-shadow: 0px 1px 1px 0px rgba(26, 26, 26, 0.5);
 }
 

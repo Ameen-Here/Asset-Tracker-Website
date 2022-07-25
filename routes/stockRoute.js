@@ -8,7 +8,6 @@ const {
   isLoggedIn,
   updateAssets,
 } = require("../controller/stockRoute");
-const { updateAsset } = require("../models/databaseHelper");
 
 // Routing for portfolio page and asset adding confirmation page
 router

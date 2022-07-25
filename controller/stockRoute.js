@@ -54,7 +54,7 @@ const showPortfolio = catchAsync(async (req, res) => {
 });
 
 const addAsset = catchAsync(async (req, res) => {
-  if (req.body.action === "cancel") return; // Check if the user pressed cancel.
+  if (req.body.action === "cancel") return res.redirect("/portfolio"); // Check if the user pressed cancel.
 
   const { noOfStock, symbol, currentPrice, stockName } = tempState;
 
@@ -100,22 +100,23 @@ const addStock = catchAsync(async (req, res) => {
   });
 });
 
+// When custom asset current value is updated
 const updateAssets = catchAsync(async (req, res) => {
-  if (req.body.action === "cancel") return;
+  if (req.body.action === "cancel") return res.redirect("/portfolio");
   const { stockName, currentPrice } = req.body;
   const testDatas = getCurrentUser(req.user);
 
-  const assets = testDatas.assets;
-
-  const desiredValue = assets.filter((asset) => {
+  const desiredValue = testData.assets.filter((asset) => {
     return asset.stockName === stockName.trim();
   })[0];
+  // Updating values
   desiredValue.currentPrice = currentPrice;
   desiredValue.totalValue = desiredValue.noOfStock * currentPrice;
   desiredValue.pAndLossPerc = findPercentage(
     desiredValue.testStockPrice,
     currentPrice
   );
+  // finding index to insert to array
   const index = getIndex(testDatas, stockName.trim());
   testDatas.assets.splice(index, 1, desiredValue);
   await testDatas.save();
