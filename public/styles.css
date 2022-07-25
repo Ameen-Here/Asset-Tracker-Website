@@ -1,5 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap");
 * {
   margin: 0;
+  font-family: "Lato", sans-serif;
 }
 
 .main-header {
@@ -28,15 +30,15 @@
   text-align: center;
 }
 .main-content {
-  color: azure;
+  color: rgba(0, 0, 0, 0.809);
   margin-top: 100px;
   margin-left: 20px;
   margin-right: auto;
 }
 
 .main-btn {
-  background-color: white;
-  color: black;
+  background-color: #343a40;
+  color: white;
   font-size: 23px;
   font-weight: 600;
 }
@@ -291,7 +293,7 @@
   padding: 5px 30px;
   padding-bottom: 5px;
   background-color: white;
-  margin: 0 15px;
+  margin: 0 25px;
   margin-bottom: 5px;
   border-radius: 5px;
   border: 1px rgb(61, 60, 60) solid;
@@ -314,6 +316,12 @@
 
 .small-text {
   font-size: 14px;
+}
+
+#customPriceUpdate {
+  background-color: white;
+  border: 0.5px solid grey;
+  border-radius: 5px;
 }
 
 /* MEDIA QUERY */

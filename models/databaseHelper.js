@@ -2,6 +2,8 @@ const { findPercentage } = require("../Utility Functions/stockCalc");
 
 const { getCurPrice } = require("../Utility Functions/apiHelperFn");
 
+const { getCurrentUser } = require("../config/currentUser");
+
 const {
   calcTotalValue,
   calcTestStockPrice,
@@ -18,15 +20,19 @@ const updateAsset = async function (
   noOfStock,
   currentPrice,
   tempState,
-  symbol
+  symbol,
+  assetValues
 ) {
+  const currentUser = getCurrentUser();
   // updating invested amount and no of stocks
   investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
   noOfStock += +assetValues.noOfStock;
 
   // update current stock price and user stock average price
   const testStockPrice = calcTestStockPrice(investedAmount, noOfStock);
-  ({ currentPrice } = await getCurPrice(symbol));
+  if (!assetValues.isCustomAsset)
+    ({ currentPrice } = await getCurPrice(symbol));
+  console.log(currentPrice);
 
   totalValue = calcTotalValue(noOfStock, currentPrice);
 

@@ -32,7 +32,8 @@ async function updateDataBase(
       noOfStock,
       currentPrice,
       tempState,
-      symbol
+      symbol,
+      assetValues
     );
 
   // Searching for the index

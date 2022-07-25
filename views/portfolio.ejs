@@ -44,6 +44,11 @@
                 P/L: Rs<%= ((company.totalValue - company.investedAmount) *
                 1).toFixed(2) %> (<%= (company.pAndLossPerc * 1).toFixed(2) %> %)
               </p>
+              <% if(company.isCustomAsset) {%>
+                  <form action="/updateStock" method="post">
+                    <button id="customPriceUpdate" type="submit" name="stockName" value="<%=company.stockName%> ">Update Current Price</button>
+                  </form>
+              <% } %> 
             </div>
           </div>
           <% } %>

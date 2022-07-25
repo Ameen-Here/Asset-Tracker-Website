@@ -1,0 +1,33 @@
+<%- layout('/layout/boilerplate.ejs') %>
+
+<form class="loginForm" action="/updateAsset" method="post">
+  <div class="card card-bg">
+    <div class="card-body">
+      <h5 class="card-title">Confirm The Transaction</h5>
+      <div class="mb-2">
+        <label for="companyName" class="form-label"
+          >Name: <%= stockName %>
+        </label>
+        <input type="hidden" name="stockName" value="<%=stockName%> " />
+      </div>
+      <div class="mb-2">
+        <label for="stock-price" class="form-label"
+          >Current Price:
+          <input
+            type="number"
+            placeholder="current price"
+            name="currentPrice"
+            required
+          />
+        </label>
+      </div>
+
+      <button name="action" value="add" type="submit" class="btn btn-success">
+        Update Current Price
+      </button>
+      <button name="action" value="cancel" type="submit" class="btn btn-danger">
+        Cancel
+      </button>
+    </div>
+  </div>
+</form>

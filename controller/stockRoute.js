@@ -1,10 +1,16 @@
 const { getTestDatas } = require("../models/userHandler");
 const { updateDataBase } = require("../models/dataBaseHandler");
 const { setCurrentUser, getCurrentUser } = require("../config/currentUser");
+const { findPercentage } = require("../Utility Functions/stockCalc");
 
 const { normalAssetBuilder, customAssetBuilder } = require("./templateBuilder");
 
-const catchAsync = require("../Utility Functions/errorHandler");
+const {
+  catchAsync,
+  isNormalAssetValid,
+  isCustomAssetValid,
+} = require("../Utility Functions/errorHandler");
+const { getIndex } = require("../Utility Functions/stockCalc");
 
 const {
   updatePortfolioAssets,
@@ -66,9 +72,19 @@ const addAsset = catchAsync(async (req, res) => {
 
   res.redirect("/portfolio");
 });
+
 const addStock = catchAsync(async (req, res) => {
   const { format, company, asset } = req.body;
+  let isFormValid = true;
 
+  // Error checking if the form is filled
+  if (format === "NormalAsset") isFormValid = isNormalAssetValid(company);
+  if (format === "customAsset") isFormValid = isCustomAssetValid(asset);
+
+  if (!isFormValid) {
+    req.flash("error", "Please fill all the inputs before submitting");
+    return res.redirect("/portfolio");
+  }
   if (format === "NormalAsset") {
     tempState = await normalAssetBuilder(company, tempState, req.user);
   } else tempState = await customAssetBuilder(asset, tempState, req.user);
@@ -84,9 +100,32 @@ const addStock = catchAsync(async (req, res) => {
   });
 });
 
+const updateAssets = catchAsync(async (req, res) => {
+  if (req.body.action === "cancel") return;
+  const { stockName, currentPrice } = req.body;
+  const testDatas = getCurrentUser(req.user);
+
+  const assets = testDatas.assets;
+
+  const desiredValue = assets.filter((asset) => {
+    return asset.stockName === stockName.trim();
+  })[0];
+  desiredValue.currentPrice = currentPrice;
+  desiredValue.totalValue = desiredValue.noOfStock * currentPrice;
+  desiredValue.pAndLossPerc = findPercentage(
+    desiredValue.testStockPrice,
+    currentPrice
+  );
+  const index = getIndex(testDatas, stockName.trim());
+  testDatas.assets.splice(index, 1, desiredValue);
+  await testDatas.save();
+  res.redirect("/portfolio");
+});
+
 module.exports = {
   showPortfolio,
   addAsset,
   addStock,
   isLoggedIn,
+  updateAssets,
 };
