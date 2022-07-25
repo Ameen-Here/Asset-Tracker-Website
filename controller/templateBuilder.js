@@ -69,8 +69,8 @@ const normalAssetBuilder = async function (company, tempState, currentUser) {
   );
 };
 
-const customAssetBuilder = async function (asset, tempState) {
-  const testData = await getTestDatas();
+const customAssetBuilder = async function (asset, tempState, currentUser) {
+  const testData = getCurrentUser(currentUser);
   // assetFunctions
   const { companyName, quantity: noOfStock, stockPrice } = asset;
   stockPriceGiven = true;

@@ -3,6 +3,7 @@ const dt = new Date(); // for checking last update
 const { MILLISECOND } = require("../Utility Functions/testData");
 const { getAsset } = require("../models/userHandler");
 const { updatePrice } = require("../models/databaseHelper");
+const { findPercentage } = require("../Utility Functions/stockCalc");
 
 const updatePortfolioAssets = async (datas) => {
   const curTime = dt.getTime(); // Getting current time to determine whether to update or not
@@ -16,7 +17,7 @@ const updatePortfolioAssets = async (datas) => {
   }
 };
 
-renderPortfolioLists = (assets) => {
+const renderTopAsset = (assets) => {
   let i = 0;
   let topGainers = [];
   // Array of asset name and it's %value sorted descending
@@ -36,7 +37,24 @@ renderPortfolioLists = (assets) => {
   return topGainers;
 };
 
+const renderTotalValue = (assets) => {
+  const totalInvestedAmount = assets
+    .map((asset) => asset.investedAmount)
+    .reduce((partialSum, asset) => partialSum + asset, 0);
+  const totalValue = assets
+    .map((asset) => asset.totalValue)
+    .reduce((partialSum, asset) => partialSum + asset, 0);
+
+  const finalProfitAndLoss = findPercentage(totalInvestedAmount, totalValue);
+  return {
+    totalInvestedAmount: totalInvestedAmount.toFixed(2),
+    totalValue: totalValue.toFixed(2),
+    finalProfitAndLoss,
+  };
+};
+
 module.exports = {
   updatePortfolioAssets,
-  renderPortfolioLists,
+  renderTopAsset,
+  renderTotalValue,
 };

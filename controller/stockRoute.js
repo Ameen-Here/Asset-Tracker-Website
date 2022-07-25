@@ -1,6 +1,6 @@
 const { getTestDatas } = require("../models/userHandler");
 const { updateDataBase } = require("../models/dataBaseHandler");
-const { setCurrentUser } = require("../config/currentUser");
+const { setCurrentUser, getCurrentUser } = require("../config/currentUser");
 
 const { normalAssetBuilder, customAssetBuilder } = require("./templateBuilder");
 
@@ -8,7 +8,8 @@ const catchAsync = require("../Utility Functions/errorHandler");
 
 const {
   updatePortfolioAssets,
-  renderPortfolioLists,
+  renderTopAsset,
+  renderTotalValue,
 } = require("./renderHelper");
 
 const isLoggedIn = (req, res, next) => {
@@ -29,7 +30,9 @@ const showPortfolio = catchAsync(async (req, res) => {
   setCurrentUser(testData);
   const assets = testData.assets;
   await updatePortfolioAssets(testData); // Will update stock price if needed
-  const topGainers = renderPortfolioLists(assets); // Render a list of top 3 stocks
+  const topGainers = renderTopAsset(assets); // Render a list of top 3 stocks
+
+  const totalInfo = renderTotalValue(assets);
 
   res.render("portfolio", {
     pageClass: "portfolioPage",
@@ -40,6 +43,7 @@ const showPortfolio = catchAsync(async (req, res) => {
     stockLabel: assets.map((data) => data.stockName),
     stockValue: assets.map((data) => data.totalValue),
     topGainers,
+    totalInfo,
   });
 });
 
@@ -48,6 +52,7 @@ const addAsset = catchAsync(async (req, res) => {
 
   const { noOfStock, symbol, currentPrice, stockName } = tempState;
 
+  const testData = getCurrentUser(req.user);
   await updateDataBase(
     "Ameen Noushad",
     symbol,
@@ -55,7 +60,8 @@ const addAsset = catchAsync(async (req, res) => {
     currentPrice,
     stockName,
     tempState,
-    req.user
+    req.user,
+    testData
   );
 
   res.redirect("/portfolio");
@@ -65,7 +71,7 @@ const addStock = catchAsync(async (req, res) => {
 
   if (format === "NormalAsset") {
     tempState = await normalAssetBuilder(company, tempState, req.user);
-  } else tempState = await customAssetBuilder(asset, tempState);
+  } else tempState = await customAssetBuilder(asset, tempState, req.user);
 
   res.render("addStock", {
     stockName: tempState.symbol,

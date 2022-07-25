@@ -5,27 +5,52 @@
     <h1 class="main-header">Portfolio Summary</h4>
     <div class="asset-summary">
       <h4 class="mb-4 asset-header">Current Holdings</h4>
+      <div id="total-info">
+          <div class="total-info-top">
+            <div class="total-info-detail">
+              <p class="text-muted">Invested</p>
+              <p><%=totalInfo.totalInvestedAmount %></p>
+            </div>
+            <div class="total-info-detail">
+              <p class="text-muted">Current</p>
+              <p><%= totalInfo.totalValue %></p>
+            </div>
+          </div>
+         
+          
+          <div class="total-info-bottom">
+            <p class="text-muted">P&L</p>
+          <p id="percentage-total"  style="color: <%= totalInfo.totalValue - totalInfo.totalInvestedAmount >= 0? 'green':'red' %> "> <%= totalInfo.totalValue - totalInfo.totalInvestedAmount >= 0? '+':'' %><%=totalInfo.totalValue -  totalInfo.totalInvestedAmount %> <span class="small-text"><%= totalInfo.totalValue - totalInfo.totalInvestedAmount >= 0? '+':'' %><%= totalInfo.finalProfitAndLoss  %>%</span></p>
 
-      <% for(let company of testData) {%>
-      <div class="asset">
-        <div class="asset-left">
-          <p><%= company.stockName %></p>
-          <p class="text-muted">
-            <%= company.noOfStock %> x Rs.<%= (company.testStockPrice * 1).toFixed(2) %>
-          </p>
-          <p>Current Price: <%= (company.currentPrice * 1).toFixed(2) %></p>
-        </div>
-        <div class="asset-right">
-          <p>Total value: Rs <%= (company.totalValue * 1).toFixed(2) %></p>
-          <p
-            style="color: <%= company.totalValue - company.investedAmount >= 0? 'green':'red' %> "
-          >
-            P/L: Rs<%= ((company.totalValue - company.investedAmount) *
-            1).toFixed(2) %> (<%= (company.pAndLossPerc * 1).toFixed(2) %> %)
-          </p>
-        </div>
+          </div>
+                  
       </div>
-      <% } %>
+
+      <div class="scrolling-asset">
+        <% for(let company of testData) {%>
+          <div class="asset">
+            <div class="asset-left">
+              <p><%= company.stockName %></p>
+              <p class="text-muted">
+                <%= company.noOfStock %> x Rs.<%= (company.testStockPrice * 1).toFixed(2) %>
+              </p>
+              <p>Current Price: <%= (company.currentPrice * 1).toFixed(2) %></p>
+            </div>
+            <div class="asset-right">
+              <p>Total value: Rs <%= (company.totalValue * 1).toFixed(2) %></p>
+              <p
+                style="color: <%= company.totalValue - company.investedAmount >= 0? 'green':'red' %> "
+              >
+                P/L: Rs<%= ((company.totalValue - company.investedAmount) *
+                1).toFixed(2) %> (<%= (company.pAndLossPerc * 1).toFixed(2) %> %)
+              </p>
+            </div>
+          </div>
+          <% } %>
+      </div>
+      
+      
+     
     </div>
   </div>
 

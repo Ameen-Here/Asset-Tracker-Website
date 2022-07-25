@@ -10,15 +10,10 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/User");
 
-const { fetchSymbol } = require("./Utility Functions/apiHelperFn");
-const AppError = require("./AppError");
-
 // Connect to mongoose
 mongoose.connect("mongodb://localhost:27017/asset-tracker", {
   useNewUrlParser: true,
-  //   useCreateIndex: true,
   useUnifiedTopology: true,
-  //   useFindAndModify: false,
 });
 
 const db = mongoose.connection;
@@ -28,7 +23,6 @@ db.once("open", () => console.log("Database Connected"));
 // Express Routes
 const generalRoute = require("./routes/login_register_home");
 const stockRoute = require("./routes/stockRoute");
-const { getTestDatas } = require("./models/userHandler");
 
 app.set("view engine", "ejs"); // Setting ejs engine and directory
 app.set("views", path.join(__dirname, "views"));
@@ -37,7 +31,6 @@ app.engine("ejs", ejsMate);
 
 app.use(express.urlencoded({ extended: true }));
 
-// app.use(express.static("public")); // Setting public directory for assets
 app.use(express.static(path.join(__dirname, "public")));
 
 // Session
@@ -76,18 +69,14 @@ app.use("/", generalRoute);
 
 app.use("/", stockRoute);
 
-app.get("/test", (req, res) => {
-  throw new AppError("password required", 401);
-  // const symbol = await fetchSymbol("sun tv");
-  // res.send("ok");
-});
-
 // Eror Handling
+// For wrong url
 app.use((req, res) => {
   req.flash("error", "The url is not accessible!!!");
   res.redirect("/");
 });
 
+// Custom errors
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something Went Wrong" } = err;
   if (err.message === "Cannot read properties of undefined (reading 'split')") {

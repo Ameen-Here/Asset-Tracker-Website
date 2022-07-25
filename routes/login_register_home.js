@@ -10,8 +10,6 @@ const { homepage, login, register } = require("../controller/loginRegister");
 
 router.get("/", homepage);
 
-// get -FORM
-// POST - login  user
 router
   .route("/login")
   .get(login)
@@ -26,8 +24,6 @@ router
     }
   );
 
-// get -FORM
-// POST - create a user
 router
   .route("/register")
   .get(register)
@@ -48,7 +44,6 @@ router
     }
   });
 
-// logout user
 router.get("/logout", (req, res) => {
   req.logout(function (err) {
     if (err) {
