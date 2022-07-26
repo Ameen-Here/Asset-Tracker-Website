@@ -450,7 +450,7 @@
     gap: 10px;
   }
   .asset-summary {
-    width: 450px;
+    width: 410px;
     margin: 12px auto;
     padding: 7px 17px;
   }
@@ -479,7 +479,7 @@
 
   #barChart {
     margin-top: 12px;
-    width: 450px;
+    width: 410px;
     height: 150px;
     margin-bottom: 30px;
   }
@@ -499,7 +499,7 @@
     gap: 10px;
   }
   .asset-summary {
-    width: 360px;
+    width: 340px;
     margin: 12px auto;
     padding: 7px 17px;
   }
@@ -548,7 +548,7 @@
     gap: 10px;
   }
   .asset-summary {
-    max-width: 350px;
+    max-width: 290px;
     margin: 10px auto;
     padding: 5px 15px;
   }
@@ -584,7 +584,7 @@
   }
 
   .asset-top-list {
-    width: 300px;
+    width: 280px;
     height: 200px;
     padding: 10px 10px;
     font-size: 14px;
