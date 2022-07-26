@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const express = require("express");
 const path = require("path");
 const ejsMate = require("ejs-mate");
@@ -9,9 +13,13 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/User");
+const MongoDBStore = require("connect-mongo")(session);
+
+require("dotenv").config();
 
 // Connect to mongoose
-mongoose.connect("mongodb://localhost:27017/asset-tracker", {
+const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/asset-camp";
+mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -34,8 +42,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Session
+const store = new MongoDBStore({
+  url: dbUrl,
+  secret: process.env.SECRET,
+  touchAfter: 24 * 60 * 60,
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
+
 const sessionConfig = {
-  secret: "thisshouldbeasecret",
+  store,
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {

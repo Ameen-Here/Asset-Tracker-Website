@@ -25,8 +25,6 @@ const updateAsset = async function (
   exchange
 ) {
   const currentUser = getCurrentUser();
-  console.log(currentPrice);
-  console.log(exchange);
   // updating invested amount and no of stocks
   investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
   noOfStock += +assetValues.noOfStock;
@@ -60,7 +58,6 @@ const updatePrice = async function (
   exchange
 ) {
   // Symbol we already have
-  console.log(testData.exchange);
   const { currentPrice } = await getCurPrice(symbol, exchange);
   const asset = getAsset(testData, index);
 

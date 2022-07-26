@@ -20,7 +20,7 @@ async function updateDataBase(
   const user = getCurrentUser(currentUser);
 
   // Getting value of assets if it exists
-  console.log(user.assets);
+
   const assetValues = user.assets.filter((asset) => {
     return asset.symbol === symbol;
   })[0];
@@ -39,8 +39,6 @@ async function updateDataBase(
       assetValues,
       exchange
     );
-
-  console.log(data);
 
   // Searching for the index
   const updatingIndex = getIndex(user, symbol);
