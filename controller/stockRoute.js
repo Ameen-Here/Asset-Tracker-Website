@@ -99,7 +99,6 @@ const addStock = catchAsync(async (req, res) => {
     );
   } else tempState = await customAssetBuilder(asset, tempState, req.user);
 
-  console.log(tempState);
   res.render("addStock", {
     stockName: tempState.symbol,
     quantity: tempState.noOfStock,

@@ -1,5 +1,6 @@
 // Fetch price by accessing the API
 const axios = require("axios"); // Fetch API call
+const AppError = require("../AppError");
 
 const getSymbol = async function (companyName, exchange) {
   let url = "";
@@ -30,7 +31,15 @@ const getCurPrice = async function (symbol, exchange) {
   }
 
   const companyDetailsFull = companyDetails.data;
-  if (!companyDetailsFull) return { currentPrice: null, symbol: null };
+  console.log(".../////////////");
+  console.log(companyDetailsFull);
+  console.log(Object.keys(companyDetailsFull["Global Quote"]).length);
+  if (Object.keys(companyDetailsFull["Global Quote"]).length === 0) {
+    throw new AppError(
+      "Cannot read properties of undefined (reading 'split')",
+      404
+    );
+  }
   console.log(companyDetailsFull["Global Quote"]["05. price"]);
   return {
     currentPrice: companyDetailsFull["Global Quote"]["05. price"],

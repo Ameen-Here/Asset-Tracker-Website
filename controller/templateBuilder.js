@@ -53,7 +53,6 @@ const normalAssetBuilder = async function (
     // Getting current updates of the particular stock
     ({ symbol } = await getSymbol(companyName, exchange));
     if (exchange !== "nasdaq") symbol = symbol.split(".")[0];
-    console.log(symbol);
     ({ currentPrice: stockPrice } = await getCurPrice(symbol, exchange));
   } else {
     // Adding given stock price
@@ -64,13 +63,7 @@ const normalAssetBuilder = async function (
 
   if (exchange !== "nasdaq") symbol = symbol.split(".")[0];
 
-  console.log("hellloooooooooo");
-  console.log(symbol);
-
   const index = getIndex(testData, symbol);
-
-  console.log(index);
-  console.log(testData);
 
   return buildTempState(
     noOfStock,

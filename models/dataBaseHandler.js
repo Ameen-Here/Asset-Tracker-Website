@@ -24,10 +24,6 @@ async function updateDataBase(
   const assetValues = user.assets.filter((asset) => {
     return asset.symbol === symbol;
   })[0];
-  console.log("././././././././././.");
-  console.log(currentPrice);
-  console.log(assetValues);
-  console.log(exchange);
 
   // To store the final data to store into db
   let data = {};
