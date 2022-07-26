@@ -43,6 +43,7 @@ const normalAssetBuilder = async function (
   currentUser,
   exchange
 ) {
+  console.log("here");
   const testData = getCurrentUser(currentUser);
 
   let symbol, stockPrice;

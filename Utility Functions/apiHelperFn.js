@@ -3,13 +3,20 @@ const axios = require("axios"); // Fetch API call
 const AppError = require("../AppError");
 
 const getSymbol = async function (companyName, exchange) {
+  console.log(companyName);
+  console.log(exchange);
+  console.log("getSymbol");
   let url = "";
   if (exchange === "nasdaq") {
     url = `https://financialmodelingprep.com/api/v3/search?query=${companyName}&limit=10&exchange=NASDAQ&apikey=d8bf28c2dc51593dbdf880a34614b018`; // Get stocks symbol name used in stock exchange.
   } else {
     url = `https://financialmodelingprep.com/api/v3/search?query=${companyName}&limit=10&exchange=NSE&apikey=d8bf28c2dc51593dbdf880a34614b018`; // Get stocks symbol name used in stock exchange.
   }
+
+  console.log(url);
   const response = await axios.get(url);
+
+  console.log(response);
 
   const companyData = response.data;
   if (!companyData.length) return "";
@@ -18,6 +25,9 @@ const getSymbol = async function (companyName, exchange) {
 };
 
 const getCurPrice = async function (symbol, exchange) {
+  console.log("getCurPrice");
+  console.log(symbol);
+  console.log(exchange);
   let companyDetails;
   if (exchange === "nasdaq") {
     console.log("here");

@@ -81,11 +81,12 @@ const addAsset = catchAsync(async (req, res) => {
 const addStock = catchAsync(async (req, res) => {
   const { format, company, asset, exchange } = req.body;
   let isFormValid = true;
+  console.log("here");
 
   // Error checking if the form is filled
   if (format === "NormalAsset") isFormValid = isNormalAssetValid(company);
   if (format === "customAsset") isFormValid = isCustomAssetValid(asset);
-
+  console.log("here after isNormal");
   if (!isFormValid) {
     req.flash("error", "Please fill all the inputs before submitting");
     return res.redirect("/portfolio");
@@ -99,6 +100,8 @@ const addStock = catchAsync(async (req, res) => {
     );
   } else tempState = await customAssetBuilder(asset, tempState, req.user);
 
+  console.log("after builder");
+  console.log(tempState);
   res.render("addStock", {
     stockName: tempState.symbol,
     quantity: tempState.noOfStock,

@@ -9,8 +9,6 @@ const {
   updateAssets,
 } = require("../controller/stockRoute");
 
-const { getSymbolUS } = require("../Utility Functions/apiHelperFn");
-
 // Routing for portfolio page and asset adding confirmation page
 router
   .route("/portfolio")

@@ -10,6 +10,11 @@
     <form action="/login">
       <button class="main-btn" type="submit">Get Started</button>
     </form>
+    <form action="/login" method="post">
+      <input type="hidden" name="username" value="harry" />
+      <input type="hidden" name="password" value="Harry123" />
+      <button class="login-btn" type="submit">Log In As Demo User</button>
+    </form>
     <% }else{ %>
     <form action="/portfolio">
       <button class="main-btn" type="submit">Show Assets</button>

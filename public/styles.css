@@ -48,6 +48,20 @@
   color: rgba(24, 24, 24, 0.724);
 }
 
+.login-btn {
+  margin-top: 5px;
+  background-color: #343a40d8;
+  color: white;
+  font-size: 16px;
+  font-weight: 400;
+  height: 28px;
+}
+
+.login-btn:hover {
+  background-color: rgba(255, 255, 255, 0.557);
+  color: rgba(48, 47, 47);
+}
+
 /* Footbar */
 .homepage-footer {
   text-align: center;
