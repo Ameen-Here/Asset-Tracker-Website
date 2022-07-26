@@ -56,7 +56,11 @@ const showPortfolio = catchAsync(async (req, res) => {
 const addAsset = catchAsync(async (req, res) => {
   if (req.body.action === "cancel") return res.redirect("/portfolio"); // Check if the user pressed cancel.
 
-  const { noOfStock, symbol, currentPrice, stockName } = tempState;
+  const { noOfStock, symbol, currentPrice, stockName, exchange } = tempState;
+
+  console.log(tempState);
+  console.log("././././././");
+  console.log(exchange);
 
   const testData = getCurrentUser(req.user);
   await updateDataBase(
@@ -67,14 +71,15 @@ const addAsset = catchAsync(async (req, res) => {
     stockName,
     tempState,
     req.user,
-    testData
+    testData,
+    exchange
   );
 
   res.redirect("/portfolio");
 });
 
 const addStock = catchAsync(async (req, res) => {
-  const { format, company, asset } = req.body;
+  const { format, company, asset, exchange } = req.body;
   let isFormValid = true;
 
   // Error checking if the form is filled
@@ -86,9 +91,15 @@ const addStock = catchAsync(async (req, res) => {
     return res.redirect("/portfolio");
   }
   if (format === "NormalAsset") {
-    tempState = await normalAssetBuilder(company, tempState, req.user);
+    tempState = await normalAssetBuilder(
+      company,
+      tempState,
+      req.user,
+      exchange
+    );
   } else tempState = await customAssetBuilder(asset, tempState, req.user);
 
+  console.log(tempState);
   res.render("addStock", {
     stockName: tempState.symbol,
     quantity: tempState.noOfStock,
@@ -106,7 +117,7 @@ const updateAssets = catchAsync(async (req, res) => {
   const { stockName, currentPrice } = req.body;
   const testDatas = getCurrentUser(req.user);
 
-  const desiredValue = testData.assets.filter((asset) => {
+  const desiredValue = testDatas.assets.filter((asset) => {
     return asset.stockName === stockName.trim();
   })[0];
   // Updating values

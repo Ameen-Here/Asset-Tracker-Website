@@ -21,18 +21,21 @@ const updateAsset = async function (
   currentPrice,
   tempState,
   symbol,
-  assetValues
+  assetValues,
+  exchange
 ) {
   const currentUser = getCurrentUser();
+  console.log(currentPrice);
+  console.log(exchange);
   // updating invested amount and no of stocks
   investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
   noOfStock += +assetValues.noOfStock;
 
   // update current stock price and user stock average price
   const testStockPrice = calcTestStockPrice(investedAmount, noOfStock);
-  if (!assetValues.isCustomAsset)
-    ({ currentPrice } = await getCurPrice(symbol));
-
+  if (!assetValues.isCustomAsset) {
+    ({ currentPrice } = await getCurPrice(symbol, exchange));
+  }
   totalValue = calcTotalValue(noOfStock, currentPrice);
 
   const pAndLossPerc = findPercentage(testStockPrice, currentPrice);
@@ -53,10 +56,12 @@ const updatePrice = async function (
   index,
   curTime,
   symbol,
-  testData
+  testData,
+  exchange
 ) {
   // Symbol we already have
-  const { currentPrice } = await getCurPrice(symbol);
+  console.log(testData.exchange);
+  const { currentPrice } = await getCurPrice(symbol, exchange);
   const asset = getAsset(testData, index);
 
   // Updating Values

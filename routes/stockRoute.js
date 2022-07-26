@@ -9,6 +9,8 @@ const {
   updateAssets,
 } = require("../controller/stockRoute");
 
+const { getSymbolUS } = require("../Utility Functions/apiHelperFn");
+
 // Routing for portfolio page and asset adding confirmation page
 router
   .route("/portfolio")
@@ -30,6 +32,7 @@ router.route("/updateStock").post((req, res) => {
   });
 });
 
+// Updating custom asset current price into db
 router.post("/updateAsset", updateAssets);
 
 module.exports = router;

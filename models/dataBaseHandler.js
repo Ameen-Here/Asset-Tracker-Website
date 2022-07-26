@@ -13,14 +13,21 @@ async function updateDataBase(
   currentPrice,
   companyName,
   tempState,
-  currentUser
+  currentUser,
+  testData,
+  exchange
 ) {
   const user = getCurrentUser(currentUser);
 
   // Getting value of assets if it exists
+  console.log(user.assets);
   const assetValues = user.assets.filter((asset) => {
     return asset.symbol === symbol;
   })[0];
+  console.log("././././././././././.");
+  console.log(currentPrice);
+  console.log(assetValues);
+  console.log(exchange);
 
   // To store the final data to store into db
   let data = {};
@@ -33,8 +40,11 @@ async function updateDataBase(
       currentPrice,
       tempState,
       symbol,
-      assetValues
+      assetValues,
+      exchange
     );
+
+  console.log(data);
 
   // Searching for the index
   const updatingIndex = getIndex(user, symbol);

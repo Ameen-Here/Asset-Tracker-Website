@@ -15,6 +15,7 @@ const buildTempState = function (
   isCustomAsset,
   testDataAssets,
   tempState,
+  exchange,
   index = -1
 ) {
   tempState = {};
@@ -32,10 +33,16 @@ const buildTempState = function (
     symbol,
     isCustomAsset,
     updateTime,
+    exchange,
   };
 };
 
-const normalAssetBuilder = async function (company, tempState, currentUser) {
+const normalAssetBuilder = async function (
+  company,
+  tempState,
+  currentUser,
+  exchange
+) {
   const testData = getCurrentUser(currentUser);
 
   let symbol, stockPrice;
@@ -44,17 +51,26 @@ const normalAssetBuilder = async function (company, tempState, currentUser) {
   const stockPriceGiven = isStockPrice == "true";
   if (!stockPriceGiven) {
     // Getting current updates of the particular stock
-    ({ symbol } = await getSymbol(companyName));
-    ({ currentPrice: stockPrice } = await getCurPrice(symbol.split(".")[0]));
+    ({ symbol } = await getSymbol(companyName, exchange));
+    if (exchange !== "nasdaq") symbol = symbol.split(".")[0];
+    console.log(symbol);
+    ({ currentPrice: stockPrice } = await getCurPrice(symbol, exchange));
   } else {
     // Adding given stock price
     ({ stockPrice } = company);
-    ({ symbol } = await getSymbol(companyName));
+    ({ symbol } = await getSymbol(companyName, exchange));
   }
   // If stock already exist, add new assets
 
-  symbol = symbol.split(".")[0];
+  if (exchange !== "nasdaq") symbol = symbol.split(".")[0];
+
+  console.log("hellloooooooooo");
+  console.log(symbol);
+
   const index = getIndex(testData, symbol);
+
+  console.log(index);
+  console.log(testData);
 
   return buildTempState(
     noOfStock,
@@ -64,6 +80,7 @@ const normalAssetBuilder = async function (company, tempState, currentUser) {
     false,
     testData.assets,
     tempState,
+    exchange,
     index
   );
 };
@@ -85,6 +102,7 @@ const customAssetBuilder = async function (asset, tempState, currentUser) {
     true,
     testData.assets,
     tempState,
+    null,
     index
   );
 };
