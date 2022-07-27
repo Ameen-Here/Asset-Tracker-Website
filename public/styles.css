@@ -494,6 +494,9 @@
 }
 
 @media (max-width: 500px) {
+  #customPriceUpdate {
+    font-size: 14px;
+  }
   .portfolio-main {
     flex-direction: column;
     gap: 10px;
@@ -543,6 +546,9 @@
 }
 
 @media (max-width: 400px) {
+  #customPriceUpdate {
+    font-size: 12px;
+  }
   .portfolio-main {
     flex-direction: column;
     gap: 10px;

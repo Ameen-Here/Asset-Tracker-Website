@@ -18,7 +18,7 @@ const MongoDBStore = require("connect-mongo")(session);
 require("dotenv").config();
 
 // Connect to mongoose
-const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/asset-camp";
+const dbUrl = process.env.DB_URL;
 mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -81,6 +81,8 @@ app.use(async (req, res, next) => {
   next();
 });
 
+app.get("*.ico", function () {}); // To prevent favicon re routing
+
 // Routing
 
 // General Routing: Homepage, Login, Register
@@ -91,10 +93,9 @@ app.use("/", stockRoute);
 // Eror Handling
 // For wrong url
 app.use((req, res) => {
-  req.flash("error", "The url is not accessible!!!");
+  req.flash("error", "Url not accessible");
   res.redirect("/");
 });
-
 // Custom errors
 app.use((err, req, res, next) => {
   const { status = 500, message = "Something Went Wrong" } = err;
