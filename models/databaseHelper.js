@@ -74,7 +74,7 @@ const updatePrice = async function (
 
   // Updating the value into database
   testData.assets.splice(index, 1, asset);
-  testData.save();
+  await testData.save();
 };
 
 module.exports = {
