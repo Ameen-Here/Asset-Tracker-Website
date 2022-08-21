@@ -2,8 +2,6 @@ const { findPercentage } = require("../Utility Functions/stockCalc");
 
 const { getCurPrice } = require("../Utility Functions/apiHelperFn");
 
-const { getCurrentUser } = require("../config/currentUser");
-
 const {
   calcTotalValue,
   calcTestStockPrice,
@@ -24,7 +22,6 @@ const updateAsset = async function (
   assetValues,
   exchange
 ) {
-  const currentUser = getCurrentUser();
   // updating invested amount and no of stocks
   investedAmount = assetValues.investedAmount + currentPrice * noOfStock;
   noOfStock += +assetValues.noOfStock;

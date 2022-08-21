@@ -90,6 +90,24 @@ app.use("/", generalRoute);
 
 app.use("/", stockRoute);
 
+app.get("/usage", (req, res) => {
+  res.render("usage", {
+    pageClass: "usage",
+    showLogin: true,
+    showReg: true,
+    titleName: "Usage",
+  });
+});
+
+app.get("/about", (req, res) => {
+  res.render("about", {
+    pageClass: "usage",
+    showLogin: true,
+    showReg: true,
+    titleName: "About",
+  });
+});
+
 // Eror Handling
 // For wrong url
 app.use((req, res) => {

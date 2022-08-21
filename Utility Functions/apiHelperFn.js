@@ -23,7 +23,6 @@ const getCurPrice = async function (symbol, exchange) {
   let companyDetails;
   const apiKey = process.env.API_ALPHA;
   if (exchange === "nasdaq") {
-    console.log("here");
     companyDetails = await axios.get(
       `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`
     );
@@ -34,7 +33,6 @@ const getCurPrice = async function (symbol, exchange) {
   }
 
   const companyDetailsFull = companyDetails.data;
-  console.log(Object.keys(companyDetailsFull["Global Quote"]).length);
   if (Object.keys(companyDetailsFull["Global Quote"]).length === 0) {
     throw new AppError(
       "Cannot read properties of undefined (reading 'split')",
