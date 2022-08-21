@@ -62,7 +62,7 @@
 
   <div class="tools">
     <div class="add-stock">
-      <form action="/addStock" class="mb-3 add-stock-form" method="post">
+      <form autocomplete="off" action="/addStock" class="mb-3 add-stock-form" method="post">
         <div class="card card-bg">
           <div class="card-body">
             <h5 class="card-title mb-2">Add stock</h5>
@@ -121,6 +121,7 @@
                   name="company[companyName]"
                   placeholder="Company Name"
                 />
+                <ul class="list" id="list"></ul>
               </div>
               <div class="mb-3">
                 <label for="quantity" class="form-label">Quantity</label>
@@ -321,8 +322,6 @@
   const totalInvestment =
     "<%-testData.map((data) => data.investedAmount)%>".split(",");
 
-  console.log(typeof totalValueArray);
-  console.log(labelBar);
 
   // setup
   const dataBar = {
@@ -356,4 +355,149 @@
     document.getElementById("myBarChart"),
     configBar
   );
+</script>
+
+
+<script>
+  const NASDAQ = [
+  "Apple Inc.",
+  "Airbnb, Inc.",
+  "Adobe Inc.",
+  "Analog Devices, Inc.",
+  "Automatic Data Processing, Inc.",
+  "Autodesk, Inc.",
+  "American Electric Power Company, Inc.",
+  "Align Technology, Inc.",
+  "Applied Materials, Inc.",
+  "Advanced Micro Devices, Inc.",
+  "Amgen Inc.",
+  "Amazon.com, Inc. ",
+  "Activision Blizzard, Inc",
+  "Broadcom Inc.",
+  "Astrazeneca PLC",
+  "Baidu, Inc.",
+  "Biogen Inc.",
+  "Booking Holdings Inc.",
+  "Cadence Design Systems, Inc.",
+  "Constellation Energy Corporation",
+  "Charter Communications, Inc.",
+  "Comcast Corporation",
+  "Costco Wholesale Corporation",
+  "Copart, Inc.",
+  "CrowdStrike Holdings, Inc.",
+  "Cisco Systems, Inc.",
+  " Cintas Corporation",
+  "Cognizant Technology Solutions Corporation",
+  "Datadog, Inc.",
+  "Dollar Tree, Inc.",
+  "DocuSign, Inc.",
+  "DexCom, Inc.",
+  "Electronic Arts Inc.",
+  "eBay Inc.",
+  "Exelon Corporation",
+  "Fastenal Company",
+  "Fiserv, Inc.",
+  "Fortinet, Inc.",
+  "Gilead Sciences, Inc.",
+  "Alphabet Inc.",
+  "Honeywell International Inc. ",
+  "Intel Corporation",
+  "Intuit Inc.",
+  "Intuitive Surgical, Inc.",
+  "JD.com, Inc.",
+  "Keurig Dr Pepper Inc.",
+  "The Kraft Heinz Company",
+  "Lucid Group, Inc.",
+  "Lam Research Corporation",
+  "lululemon athletica inc.",
+  "Marriott International",
+  "Microchip Technology Incorporated",
+  "Mondelez International, Inc.",
+  "MercadoLibre, Inc.",
+  "Meta Platforms, Inc.",
+  "Monster Beverage Corporation",
+  "Moderna, Inc.",
+  "Marvell Technology, Inc.",
+  "Microsoft Corporation",
+  "Match Group, Inc.",
+  "Micron Technology, Inc.",
+  "Netflix, Inc.",
+  "NetEase, Inc.",
+  "NVIDIA Corporation",
+  "Old Dominion Freight Line, Inc.",
+  "Okta, Inc.",
+  "O'Reilly Automotive, Inc.",
+  "Palo Alto Networks, Inc.",
+  "Paychex, Inc.",
+  "Pinduoduo Inc.",
+  "Pepsico, Inc.",
+  "PayPal Holdings, Inc.",
+  "QUALCOMM Incorporated",
+  "Regeneron Pharmaceuticals, Inc.",
+  "Ross Stores, Inc.",
+  "Starbucks Corporation",
+  "Seagen Inc.",
+  "Sirius XM Holdings Inc.",
+  "Synopsys, Inc.",
+  "Splunk Inc.",
+  "Skyworks Solutions, Inc.",
+  "Atlassian Corporation Plc",
+  "T-Mobile US, Inc.",
+  "Tesla, Inc.",
+  "Texas Instruments Incorporated",
+  "Verisk Analytics, Inc.",
+  "VeriSign, Inc.",
+  "Vertex Pharmaceuticals Incorporated",
+  "Walgreens Boots Alliance, Inc.",
+  "Workday, Inc.",
+  "Xcel Energy Inc.",
+  "Zoom Video Communications, Inc.",
+  "Zscaler, Inc.",
+];
+
+  const companyNameInputField = document.getElementById("companyName")
+
+
+  const listSection = document.getElementById(list)
+
+  companyNameInputField.addEventListener("keyup", (e) => {
+    const foundedItems = []
+    const enteredInput = e.target.value.toLowerCase()
+    removeElements();
+    if(enteredInput.trim().length > 0){
+      let count = 0
+      for (let i of NASDAQ) {
+        if(count === 4) break
+    //convert input to lowercase and compare with each string
+    if (
+      i.toLowerCase().startsWith(enteredInput)) {
+      //create li element
+      let listItem = document.createElement("li");
+      //One common class name
+      listItem.classList.add("list-items");
+      listItem.style.cursor = "pointer";
+      listItem.setAttribute("onclick", "displayNames('" + i + "')");
+      //Display matched part in bold
+      let word = "<b>" + i.substr(0, enteredInput.length) + "</b>";
+      word += i.substr(enteredInput.length);
+      //display the value in array
+      listItem.innerHTML = word;
+      document.querySelector(".list").appendChild(listItem);
+      count++;
+    }
+  }
+    }
+
+});
+  function displayNames(value) {
+  companyNameInputField.value = value;
+  removeElements();
+}
+
+function removeElements() {
+  //clear all the item
+  let items = document.querySelectorAll(".list-items");
+  items.forEach((item) => {
+    item.remove();
+  });}
 </script>
